@@ -13,16 +13,18 @@
 class Simulator {
 
 public:
-	Simulator();
+	Simulator(int, int);
     bool NewProcess(std::tuple<int, int, float, float, float>);
 	void UpdateTime(uint32_t &);
+	void BlockProcess();
+	void CheckBlockedQueue();
     void StartSimulation();
     void CalcStatistics();
     void PrintResults();
 
 private:
 	float startTime;
-    int processCounter, maxProcessMultiprogramming;
+    int processCounter, maxProcessMultiprogramming, SPEED_;
     // Scheduling process' queues
     std::vector<Process> blockedQueue, readyQueue, incomingQueue;
 	// Statistics

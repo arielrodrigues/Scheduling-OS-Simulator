@@ -1,7 +1,9 @@
-#include "SOS-Sim.h"
+#include "sOS-Sim.h"
 
-Simulator::Simulator() {
+Simulator::Simulator(int maxMultiprogramming, int speed) {
     this->startTime = time(NULL);
+    this->maxProcessMultiprogramming = maxMultiprogramming;
+    this->SPEED_ = speed/5;
 
     this->_elapsedTime = 0;
     this->_processorUse = 0;
@@ -22,10 +24,20 @@ bool Simulator::NewProcess(std::tuple<int, int, float, float, float> _process) {
         Process process(_process);
         // put process in ready queue (if submission time == 0) or incoming queue (else)
         process.getSubmissionTime() == 0? readyQueue.push_back(process): incomingQueue.push_back(process);
+
+        this->processCounter++;
         return true;
     } catch (...) {
             return false;
     }
+
+}
+
+void Simulator::BlockProcess() {
+
+}
+
+void Simulator::CheckBlockedQueue() {
 
 }
 
@@ -35,7 +47,7 @@ bool Simulator::NewProcess(std::tuple<int, int, float, float, float> _process) {
  */
 void Simulator::UpdateTime(uint32_t &i) {
     _elapsedTime = this->startTime - time(NULL);
-    if (_elapsedTime >= i*10) i++;
+    if (_elapsedTime >= i*SPEED_) i++;
 }
 /***
  * Checks if has process in one of queues
