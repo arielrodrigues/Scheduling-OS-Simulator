@@ -1,2 +1,2 @@
-# Simple-OS-Simulator
-a simple os simulator in c++
+# Scheduling-OS-Simulator
+a simple scheduling os simulator in c++
