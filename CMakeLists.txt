@@ -3,5 +3,7 @@ project(Simple_OS_Simulator)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp
+                 Process.cpp
+                 SOS-Sim.cpp)
 add_executable(Simple_OS_Simulator ${SOURCE_FILES})

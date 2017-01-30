@@ -9,30 +9,30 @@ Process::Process() {
 }
 
 Process::Process(std::tuple<int, int, float, float, float> _process) {
-    this.PID = _getPID(_process);
-    this.priority = _getPriority(_process);
-    this.submissionTime = _getSubmissionTime(_process);
-    this.executionTime = _getExecutionTime(_process);
-    this.blockTime = _getBlocketTime(_process);
+    this->PID = _getPID(_process);
+    this->priority = _getPriority(_process);
+    this->submissionTime = _getSubmissionTime(_process);
+    this->executionTime = _getExecutionTime(_process);
+    this->blockTime = _getBlocketTime(_process);
 }
 
-Process::decrementBlockTime() {
+void Process::decrementBlockTime() {
     this->blockTime--;
 }
 
-Process::decrementExecutionTime() {
+void Process::decrementExecutionTime() {
     this->executionTime--;
 }
 
-Process::decrementSubmissionTime() {
+void Process::decrementSubmissionTime() {
     this->submissionTime--;
 }
 
-float Process::getPID() {
+int Process::getPID() {
     return PID;
 }
 
-float Process::getPriority() {
+int Process::getPriority() {
     return priority;
 }
 

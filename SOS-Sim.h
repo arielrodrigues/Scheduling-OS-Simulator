@@ -26,8 +26,10 @@ private:
     // Scheduling process' queues
     std::vector<Process> blockedQueue, readyQueue, incomingQueue;
 	// Statistics
-	float _elapsedTime, _processorUse, _thoughput, _avgWaitingTime,
-		  _avgResponseTime, _avgTurnaroungTime, _avgServiceTime;
+	float _elapsedTime, _processorUse, _throughput, _avgWaitingTime,
+		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;
+
+    bool EmptyQueue();
 };
 
 
