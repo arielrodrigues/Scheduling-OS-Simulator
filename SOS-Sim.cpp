@@ -1,4 +1,4 @@
-#include "Simulator.h"
+#include "SOS-Sim.h"
 
 Simulator::Simulator() {
 #pragma region inicializações_de_variaveis

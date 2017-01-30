@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Simulator.h"
+#include "SOS-Sim.h"
 
 int main() {
     std::cout << "Hello!\n";
