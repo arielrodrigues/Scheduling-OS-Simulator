@@ -1,15 +1,15 @@
 #include "SOS-Sim.h"
 
 Simulator::Simulator() {
-#pragma region inicializações_de_variaveis
-    this->duracaoSimulacao = 0f;
-    this->utilizacaoProcessador = 0f;
-    this->tempoEsperaMedio = 0f;
-    this->tempoRespostaMedio = 0f;
-    this->tempoRetornoMedio = 0f;
-    this->tempoServicoMedio = 0f;
-    this->throughput = 0f;
-#pragma endregion
+    this->startTime = time(NULL);
+
+    this->_elapsedTime = 0f;
+    this->_processorUse = 0f;
+    this->_avgWaitingTime = 0f;
+    this->_avgResponseTime = 0f;
+    this->_avgTurnaroungTime = 0f;
+    this->_avgServiceTime = 0f;
+    this->_throughput = 0f;
 }
 
 /**
@@ -17,7 +17,7 @@ Simulator::Simulator() {
  * @param _process
  * @return success
  */
-bool Simulator::CreateProcess(std::tuple _process) {
+bool Simulator::NewProcess(std::tuple<int, int, float, float, float> _process) {
     try {
         Process process = new Process(_process);
         // put process in ready queue (if submission time == 0) or incoming queue (else)
@@ -29,8 +29,25 @@ bool Simulator::CreateProcess(std::tuple _process) {
 
 }
 
-Simulator::StartSimulation() {
+/***
+ * Update elapsedTime and increments i in 10 and 10 seconds
+ * @param i
+ */
+void Simulator::UpdateTime(uint32_t &i) {
+    elapsedTime = this->startTime - time(NULL);
+    if (elapsedTime >= i*10) i++;
+}
 
+Simulator::StartSimulation() {
+    // Checks if has process in one of queues
+    auto emptyQueue = []() { return incomingQueue.empty()
+               && readyQueue.empty() && blockedQueue.empty(); };
+    for (uint32_t* i = new int(0); !emptyQueue(); UpdateTime(i)){
+        /***
+         * pega processos aqui dentro e executa
+         */
+    }
+    CalcStatistics();
 }
 
 /**

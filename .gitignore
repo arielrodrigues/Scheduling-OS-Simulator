@@ -66,3 +66,7 @@ cmake-build-debug/Makefile
 cmake-build-debug/Simple_OS_Simulator
 cmake-build-debug/Simple_OS_Simulator.cbp
 cmake-build-debug/cmake_install.cmake
+CMakeLists.txt
+cmake-build-debug/CMakeFiles/Progress/2
+cmake-build-debug/CMakeFiles/Progress/count.txt
+main.cpp

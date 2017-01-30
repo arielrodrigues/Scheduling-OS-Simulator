@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -13,17 +14,20 @@ class Simulator {
 
 public:
 	Simulator();
-    bool CreateProcess(std::tuple<int, int, float, float, float>);
+    bool NewProcess(std::tuple<int, int, float, float, float>);
+	void UpdateTime(uint32_t &);
     void StartSimulation();
     void CalcStatistics();
     void PrintResults();
 
 private:
-	float _totalTime, _processorUse, _thoughput, _avgWaitingTime,
-          _avgResponseTime, _avgTurnaroungTime, _avgServiceTime;
+	float startTime;
     int processCounter, maxProcessMultiprogramming;
     // Scheduling process' queues
     std::vector<Process> blockedQueue, readyQueue, incomingQueue;
+	// Statistics
+	float _elapsedTime, _processorUse, _thoughput, _avgWaitingTime,
+		  _avgResponseTime, _avgTurnaroungTime, _avgServiceTime;
 };
 
 
