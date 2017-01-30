@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
-#include <iomanip>
 #include <tuple>
+#include <vector>
+#include "Process.h"
 
 #ifndef SIMPLE_OS_SIMULATOR_SIMULATOR_H
 #define SIMPLE_OS_SIMULATOR_SIMULATOR_H
@@ -12,13 +12,18 @@
 class Simulator {
 
 public:
-    Simulator();
+	Simulator();
+    bool CreateProcess(std::tuple<int, int, float, float, float>);
+    void StartSimulation();
+    void CalcStatistics();
+    void PrintResults();
 
 private:
-    //camelCase??
-    float tempoRetornoMedio, tempoServicoMedio, utilizacaoProcessador,
-            tempoRespostaMedio, throughput, tempoEsperaMedio, duracaoSimulacao;
-
+	float _totalTime, _processorUse, _thoughput, _avgWaitingTime,
+          _avgResponseTime, _avgTurnaroungTime, _avgServiceTime;
+    int processCounter, maxProcessMultiprogramming;
+    // Scheduling process' queues
+    std::vector<Process> blockedQueue, readyQueue, incomingQueue;
 };
 
 
