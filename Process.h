@@ -23,15 +23,17 @@ public:
     void decrementExecutionTime();
     void decrementBlockTime();
     void decrementSubmissionTime();
+    void decrementWaitingTime();
     int getPID();
     int getPriority();
     float getExecutionTime();
     float getBlockTime();
     float getSubmissionTime();
+    float getWaitingTime();
 
 private:
     int PID, priority;
-    float submissionTime, executionTime, blockTime;
+    float submissionTime, executionTime, blockTime, waitingTime;
 };
 
 

@@ -28,6 +28,10 @@ void Process::decrementSubmissionTime() {
     this->submissionTime--;
 }
 
+void Process::decrementWaitingTime() {
+    this->waitingTime--;
+}
+
 int Process::getPID() {
     return PID;
 }
@@ -46,4 +50,8 @@ float Process::getExecutionTime() {
 
 float Process::getBlockTime() {
     return blockTime;
+}
+
+float Process::getWaitingTime() {
+    return waitingTime;
 }
