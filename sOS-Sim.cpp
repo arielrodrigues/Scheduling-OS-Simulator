@@ -33,12 +33,50 @@ bool Simulator::NewProcess(std::tuple<int, int, float, float, float> _process) {
 
 }
 
-void Simulator::BlockProcess() {
 
+/***
+ * Check process in read queue and move then (if executiontime <= 0 ) to block queue
+ *
+ */
+void Simulator::CheckReadyQueue() {
+    auto i = 0;
+    for (auto _process: readyQueue) {
+        if (_process.getExecutionTime() <= 0) { // move to blockedQueue
+            blockedQueue.push_back(readyQueue[i]);
+            readyQueue.erase(readyQueue.begin() + i);
+        }
+        _process.decrementExecutionTime(); i++;
+    }
 }
 
+/***
+ * Check process in blocked queue and move then (if blockedtime <= 0) to ready queue
+ *
+ */
 void Simulator::CheckBlockedQueue() {
+    auto i = 0;
+    for (auto _process: blockedQueue) {
+        if (_process.getBlockTime() <= 0) { // move to readyQueue
+            readyQueue.push_back(blockedQueue[i]);
+            blockedQueue.erase(blockedQueue.begin() + i);
+        }
+        _process.decrementBlockTime(); i++;
+    }
+}
 
+/***
+ * Check process in incoming queue and move then (if submissiontime <= 0) to ready queue
+ *
+ */
+void Simulator::CheckIncomingQueue() {
+    auto i = 0;
+    for (auto _process: incomingQueue) {
+        if (_process.getSubmissionTime() <= 0) { // move to readyQueue
+            readyQueue.push_back(incomingQueue[i]);
+            incomingQueue.erase(incomingQueue.begin() + i);
+        }
+        _process.decrementSubmissionTime(); i++;
+    }
 }
 
 /***
@@ -49,9 +87,10 @@ void Simulator::UpdateTime(uint32_t &i) {
     _elapsedTime = this->startTime - time(NULL);
     if (_elapsedTime >= i*SPEED_) i++;
 }
+
 /***
  * Checks if has process in one of queues
- * @return
+ * @return incomingqueue and readyqueue and blockedqueue are empty?
  */
 bool Simulator::EmptyQueue() {
     return incomingQueue.empty()

@@ -16,8 +16,9 @@ public:
 	Simulator(int, int);
     bool NewProcess(std::tuple<int, int, float, float, float>);
 	void UpdateTime(uint32_t &);
-	void BlockProcess();
+    void CheckReadyQueue();
 	void CheckBlockedQueue();
+    void CheckIncomingQueue();
     void StartSimulation();
     void CalcStatistics();
     void PrintResults();
