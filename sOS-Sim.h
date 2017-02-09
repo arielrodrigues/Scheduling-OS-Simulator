@@ -14,20 +14,21 @@ class Simulator {
 
 public:
 	Simulator(int, int);
-    bool NewProcess(std::tuple<int, int, float, float, float>);
+    bool StartProcess(std::tuple<int, int, float, float, float>);
 	void UpdateTime(uint32_t &);
-    void CheckReadyQueue();
+    void CheckProcessRunning();
 	void CheckBlockedQueue();
     void CheckIncomingQueue();
-    void StartSimulation();
+    void TerminateProcess(Process);
+    void StartSimulation(auto*, std::vector<std::tuple<int, int, float, float, float>>);
     void CalcStatistics();
     void PrintResults();
 
 private:
 	float startTime;
-    int processCounter, maxProcessMultiprogramming, SPEED_;
+    int processRunningCounter, maxProcessMultiprogramming, SPEED_, lastPID;
     // Scheduling process' queues
-    std::vector<Process> blockedQueue, readyQueue, incomingQueue;
+    std::vector<Process> blockedQueue, readyQueue, incomingQueue, runningList;
 	// Statistics
 	float _elapsedTime, _processorUse, _throughput, _avgWaitingTime,
 		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;

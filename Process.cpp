@@ -52,6 +52,11 @@ float Process::getBlockTime() {
     return blockTime;
 }
 
+float Process::getResponseTime() {
+    return responseTime;
+}
+
 float Process::getWaitingTime() {
     return waitingTime;
 }
+
