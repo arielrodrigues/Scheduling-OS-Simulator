@@ -8,9 +8,9 @@
 // Define functions to get tuple itens
 #define _getPID(x) std::get<0>(x)
 #define _getPriority(x) std::get<1>(x)
-#define _getExecutionTime(x) std::get<2>(x)
-#define _getBlocketTime(x) std::get<3>(x)
-#define _getSubmissionTime(x) std::get<4>(x)
+#define _getSubmissionTime(x) std::get<2>(x)
+#define _getExecutionTime(x) std::get<3>(x)
+#define _getBlocketTime(x) std::get<4>(x)
 
 /***
  * Data structure of the process

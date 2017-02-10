@@ -49,12 +49,14 @@ void Simulator::TerminateProcess(Process _process) {
 void Simulator::CheckProcessRunning() {
     auto i = 0;
     for (auto _process: runningList) {
-        if (_process.getExecutionTime() <= 0) { // move to blockedQueue
-            blockedQueue.push_back(runningList[i]);
+        if (_process.getExecutionTime() <= 0) { // move to blockedQueue or finnish Process
+            if (_process.getBlockTime() <= 0) TerminateProcess(runningList[i]);
+            else blockedQueue.push_back(runningList[i]);
+
             runningList.erase(runningList.begin() + i);
             processRunningCounter--;
         }
-        _process.decrementExecutionTime(); i++;
+        runningList[i].decrementExecutionTime(); i++;
     }
 }
 
@@ -65,11 +67,13 @@ void Simulator::CheckProcessRunning() {
 void Simulator::CheckBlockedQueue() {
     auto i = 0;
     for (auto _process: blockedQueue) {
-        if (_process.getBlockTime() <= 0) { // move to readyQueue
-            readyQueue.push_back(blockedQueue[i]);
+        if (_process.getBlockTime() <= 0) { // move to readyQueue or finnish process
+            if (_process.getExecutionTime() <= 0) TerminateProcess(blockedQueue[i]);
+            else readyQueue.push_back(blockedQueue[i]);
+
             blockedQueue.erase(blockedQueue.begin() + i);
         }
-        _process.decrementBlockTime(); i++;
+        blockedQueue[i].decrementBlockTime(); i++;
     }
 }
 
@@ -84,7 +88,7 @@ void Simulator::CheckIncomingQueue() {
             readyQueue.push_back(incomingQueue[i]);
             incomingQueue.erase(incomingQueue.begin() + i);
         }
-        _process.decrementSubmissionTime(); i++;
+        incomingQueue[i].decrementSubmissionTime(); i++;
     }
 }
 
@@ -106,18 +110,18 @@ bool Simulator::EmptyQueue() {
            && readyQueue.empty() && blockedQueue.empty();
 }
 
-void Simulator::StartSimulation(auto* algorithm, std::vector<std::tuple<int, int, float, float, float>> process) {
+void Simulator::StartSimulation(bool (*algorithm)(std::vector <Process>*, std::vector<Process>*),
+        std::vector<std::tuple<int, int, float, float, float>> process) {
 
     for (std::tuple<int, int, float, float, float> _process : process)
         StartProcess(_process);
 
     for (uint32_t* i = new uint32_t(0); !EmptyQueue(); UpdateTime(*i)){
-        if (processRunningCounter < maxProcessMultiprogramming) {
+        if (processRunningCounter < maxProcessMultiprogramming)
             algorithm(&readyQueue, &runningList);
-            /***
-             * pega processos aqui dentro e executa
-             */
-        }
+        CheckBlockedQueue();
+        CheckIncomingQueue();
+        CheckProcessRunning();
     }
     CalcStatistics();
 }

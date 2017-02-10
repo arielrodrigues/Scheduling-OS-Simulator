@@ -20,7 +20,8 @@ public:
 	void CheckBlockedQueue();
     void CheckIncomingQueue();
     void TerminateProcess(Process);
-    void StartSimulation(auto*, std::vector<std::tuple<int, int, float, float, float>>);
+    void StartSimulation(bool (*algorithm)(std::vector <Process>*, std::vector<Process>*),
+						 std::vector<std::tuple<int, int, float, float, float>>);
     void CalcStatistics();
     void PrintResults();
 
