@@ -70,3 +70,4 @@ CMakeLists.txt
 cmake-build-debug/CMakeFiles/Progress/2
 cmake-build-debug/CMakeFiles/Progress/count.txt
 main.cpp
+cmake-build-debug/Project.cbp
