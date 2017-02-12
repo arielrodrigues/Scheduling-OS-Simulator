@@ -1,12 +1,23 @@
 #include "sOS-Sim.h"
 
-Simulator::Simulator(int maxMultiprogramming, int speed) {
-    this->startTime = time(NULL);
-    this->maxProcessMultiprogramming = maxMultiprogramming;
-    this->SPEED_ = speed/5;
-    this->lastPID = 0;
-    this->processRunningCounter = 0;
+bool Simulator::debugmode;
 
+/***
+ * Constructor to the simulator
+ * @param maxMultiprogramming - number of max. process running at same time (multiprogramming)
+ * @param speed - speed of simulator
+ * @param debugmode - active debuglog
+ */
+
+Simulator::Simulator(int maxMultiprogramming, int speed, bool debugmode) {
+    Simulator::debugmode = debugmode;
+    this->SPEED_ = speed/2.0;
+    this->maxProcessMultiprogramming = maxMultiprogramming;
+
+    this->lastUpdate = 0;
+    this->countProcess = 0;
+    this->processRunningCounter = 0;
+    // statistics
     this->_elapsedTime = 0;
     this->_processorUse = 0;
     this->_avgWaitingTime = 0;
@@ -24,71 +35,64 @@ Simulator::Simulator(int maxMultiprogramming, int speed) {
 bool Simulator::StartProcess(std::tuple<int, int, float, float, float> _process) {
     try {
         Process process(_process);
-        // put process in ready queue (if submission time == 0) or incoming queue (else)
-        process.getSubmissionTime() == 0? readyQueue.push_back(process): incomingQueue.push_back(process);
-
-        this->lastPID++;
+        // create process in readyqueue (if submission time == 0) or send for incomingqueue (else)
+        (process.getSubmissionTime() == 0)? readyQueue.push_back(process), DebugLog(_elapsedTime,
+                              "Processo "+std::to_string(process.getPID())+" pronto"): incomingQueue.push_back(process);
+        countProcess++;
         return true;
     } catch (...) {
             return false;
     }
-
 }
 
+/***
+ * Terminate a process and update simulator statistics
+ * @param _process
+ */
 void Simulator::TerminateProcess(Process _process) {
-    this->_avgWaitingTime += _process.getWaitingTime();
-    this->_avgResponseTime += _process.getResponseTime();
-    this->_avgServiceTime += _process.getExecutionTime();
-    this->_avgTurnaroundTime += (_process.getExecutionTime() + _process.getWaitingTime() + _process.getBlockTime());
-}
-
-/***
- * Check process in running queue and move then (if executiontime <= 0 ) to block queue
- *
- */
-void Simulator::CheckProcessRunning() {
-    auto i = 0;
-    for (auto _process: runningList) {
-        if (_process.getExecutionTime() <= 0) { // move to blockedQueue or finnish Process
-            if (_process.getBlockTime() <= 0) TerminateProcess(runningList[i]);
-            else blockedQueue.push_back(runningList[i]);
-
-            runningList.erase(runningList.begin() + i);
-            processRunningCounter--;
-        }
-        runningList[i].decrementExecutionTime(); i++;
-    }
-}
-
-/***
- * Check process in blocked queue and move then (if blockedtime <= 0) to ready queue
- *
- */
-void Simulator::CheckBlockedQueue() {
-    auto i = 0;
-    for (auto _process: blockedQueue) {
-        if (_process.getBlockTime() <= 0) { // move to readyQueue or finnish process
-            if (_process.getExecutionTime() <= 0) TerminateProcess(blockedQueue[i]);
-            else readyQueue.push_back(blockedQueue[i]);
-
-            blockedQueue.erase(blockedQueue.begin() + i);
-        }
-        blockedQueue[i].decrementBlockTime(); i++;
-    }
+    _avgWaitingTime += _process.getWaitingTime();
+    _avgResponseTime += _process.getResponseTime();
+    _avgServiceTime += _process.getExecutionTime();
+    _avgTurnaroundTime += (_process.getExecutionTime() + _process.getWaitingTime() + _process.getBlockTime());
+    DebugLog(_elapsedTime, ("Processo " + std::to_string(_process.getPID()) + " finalizado"));
 }
 
 /***
  * Check process in incoming queue and move then (if submissiontime <= 0) to ready queue
- *
  */
 void Simulator::CheckIncomingQueue() {
-    auto i = 0;
-    for (auto _process: incomingQueue) {
-        if (_process.getSubmissionTime() <= 0) { // move to readyQueue
+    for (auto i = incomingQueue.size(); i-- > 0;) {
+        if (remaningSubmissionTime(incomingQueue[i]) <= 0) { // move to readyQueue
             readyQueue.push_back(incomingQueue[i]);
             incomingQueue.erase(incomingQueue.begin() + i);
+            DebugLog(_elapsedTime, "Processo " + std::to_string(incomingQueue[i].getPID()) + " pronto");
         }
-        incomingQueue[i].decrementSubmissionTime(); i++;
+    }
+}
+
+/***
+ * Check process in running queue and move then (if executiontime <= 0 ) to block queue
+ */
+void Simulator::CheckProcessRunning() {
+    for (auto i = runningList.size(); i-- > 0;) {
+        if (runningList[i].getWaitingTime() == 0) runningList[i].setWaitingTime(_elapsedTime);
+        if (remainingExecutionTime(runningList[i]) <= 0) { // move to blockedQueue
+            blockedQueue.push_back(runningList[i]);
+            runningList.erase(runningList.begin() + i); processRunningCounter--;
+            DebugLog(_elapsedTime, ("Processo " + std::to_string(runningList[i].getPID()) + " bloqueado"));
+        }
+    }
+}
+
+/***
+ * Check process in blockedqueue and terminate it (if blockedtime <= 0)
+ */
+void Simulator::CheckBlockedQueue() {
+    for (auto i = blockedQueue.size(); i-- > 0;) {
+        if (remainingBlockTime(blockedQueue[i]) <= 0) { // terminate process
+            TerminateProcess(blockedQueue[i]); blockedQueue.erase(blockedQueue.begin() + i);
+            if (blockedQueue[i].getResponseTime() == 0) blockedQueue[i].setResponseTime(_elapsedTime);
+        }
     }
 }
 
@@ -96,9 +100,14 @@ void Simulator::CheckIncomingQueue() {
  * Update elapsedTime and increments i in 1 and 1 seconds
  * @param i
  */
-void Simulator::UpdateTime(uint32_t &i) {
-    this->_elapsedTime = this->startTime - time(NULL);
-    if (_elapsedTime >= i*SPEED_) i++;
+void Simulator::UpdateTime() {
+    if (time(NULL) - lastUpdate >= SPEED_) {
+        lastUpdate = time(NULL);
+        CheckIncomingQueue();
+        CheckProcessRunning();
+        CheckBlockedQueue();
+        _elapsedTime++;
+    }
 }
 
 /***
@@ -107,22 +116,27 @@ void Simulator::UpdateTime(uint32_t &i) {
  */
 bool Simulator::EmptyQueue() {
     return incomingQueue.empty()
-           && readyQueue.empty() && blockedQueue.empty();
+           && readyQueue.empty() && blockedQueue.empty() && runningList.empty();
 }
 
-void Simulator::StartSimulation(bool (*algorithm)(std::vector <Process>*, std::vector<Process>*),
+/***
+ * Start the simulation using the algorithm parameter-passed to schedule process
+ * with the end of simulation statistics are calculated
+ * @param algorithm - pointer to scheduling algorithm
+ * @param process - a vector of tuples with information of process
+ */
+void Simulator::StartSimulation(bool (*algorithm)(std::vector<Process>*, std::vector<Process>*, double),
         std::vector<std::tuple<int, int, float, float, float>> process) {
 
+    DebugLog("Inicio da simulação:");
     for (std::tuple<int, int, float, float, float> _process : process)
         StartProcess(_process);
 
-    for (uint32_t* i = new uint32_t(0); !EmptyQueue(); UpdateTime(*i)){
+    for (; !EmptyQueue(); UpdateTime())
         if (processRunningCounter < maxProcessMultiprogramming)
-            algorithm(&readyQueue, &runningList);
-        CheckBlockedQueue();
-        CheckIncomingQueue();
-        CheckProcessRunning();
-    }
+            if (!algorithm(&readyQueue, &runningList, _elapsedTime))
+                std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
+
     CalcStatistics();
 }
 
@@ -130,22 +144,33 @@ void Simulator::StartSimulation(bool (*algorithm)(std::vector <Process>*, std::v
  * Calc statistics and update variables
  */
 void Simulator::CalcStatistics() {
-    this->_elapsedTime = this->startTime - time(NULL);
-    //this->_processorUse = ???
-    //this->_throughput /= ??
-    this->_avgWaitingTime /= this->lastPID;
-    this->_avgResponseTime /= this->lastPID;
-    this->_avgTurnaroundTime /= this->lastPID;
-    this->_avgServiceTime /= this->lastPID;
+    DebugLog(_elapsedTime, "Fim da simulação\n*******************************\nCalculando estatísticas");
+    _processorUse = 0;
+    _throughput = 0;
+    _avgWaitingTime /= countProcess;
+    _avgResponseTime /= countProcess;
+    _avgTurnaroundTime /= countProcess;
+    _avgServiceTime /= countProcess;
 }
 
 /**
  * Print results from simulation
  */
-void Simulator::PrintResults() {
-    std::cout << "Duração da Simulação: " << this->_elapsedTime << "\nEficiência: " << this->_processorUse
-              << "\nVazão: " << this->_throughput << "\nTempo médio de espera: " << this->_avgWaitingTime
-              << "\nTempo médio de resposta: " << this->_avgResponseTime
-              << "\nTempo médio de retorno: " << this->_avgTurnaroundTime
-              << "\nTempo médio de serviço: " << this->_avgServiceTime;
+std::string Simulator::getResults() {
+    std::stringstream out;
+    out << "*******************************\n";
+    out << "Duração da Simulação: " << _elapsedTime << "\nEficiência: " << _processorUse
+        << "\nVazão: " << _throughput << "\nTempo médio de espera: " << _avgWaitingTime
+        << "\nTempo médio de resposta: " << _avgResponseTime
+        << "\nTempo médio de retorno: " << _avgTurnaroundTime
+        << "\nTempo médio de serviço: " << _avgServiceTime;
+    return out.str();
+}
+
+void Simulator::DebugLog(std::string happen) {
+    if (Simulator::debugmode) std::cout << happen << std::endl;
+}
+
+void Simulator::DebugLog(double instantTime, std::string happen) {
+    if (Simulator::debugmode) std::cout << "T = " << instantTime << ": " << happen << std::endl;
 }

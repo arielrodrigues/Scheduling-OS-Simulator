@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <ctime>
 #include <string>
@@ -8,33 +9,38 @@
 
 #ifndef SIMPLE_OS_SIMULATOR_SIMULATOR_H
 #define SIMPLE_OS_SIMULATOR_SIMULATOR_H
+#define remainingExecutionTime(_process) _process.getExecutionTime() + _process.getSubmissionTime() - _elapsedTime
+#define remainingBlockTime(_process) _process.getExecutionTime() + _process.getSubmissionTime() + _process.getBlockTime() - _elapsedTime
+#define remaningSubmissionTime(_process) _process.getSubmissionTime() - _elapsedTime
 
 
 class Simulator {
 
 public:
-	Simulator(int, int);
-    bool StartProcess(std::tuple<int, int, float, float, float>);
-	void UpdateTime(uint32_t &);
-    void CheckProcessRunning();
-	void CheckBlockedQueue();
-    void CheckIncomingQueue();
-    void TerminateProcess(Process);
-    void StartSimulation(bool (*algorithm)(std::vector <Process>*, std::vector<Process>*),
+	Simulator(int, int, bool);
+    void StartSimulation(bool (*algorithm)(std::vector <Process>*, std::vector<Process>*, double),
 						 std::vector<std::tuple<int, int, float, float, float>>);
-    void CalcStatistics();
-    void PrintResults();
+    std::string getResults();
+	static void DebugLog(std::string happen);
+	static void DebugLog(double instantTime, std::string happen);
 
 private:
-	float startTime;
-    int processRunningCounter, maxProcessMultiprogramming, SPEED_, lastPID;
+	bool EmptyQueue();
+	void TerminateProcess(Process);
+	bool StartProcess(std::tuple<int, int, float, float, float>);
+	void UpdateTime();
+	void CheckProcessRunning();
+	void CheckBlockedQueue();
+	void CheckIncomingQueue();
+	void CalcStatistics();
+
+	static bool debugmode;
+    int _elapsedTime, processRunningCounter, maxProcessMultiprogramming, countProcess;
     // Scheduling process' queues
     std::vector<Process> blockedQueue, readyQueue, incomingQueue, runningList;
 	// Statistics
-	float _elapsedTime, _processorUse, _throughput, _avgWaitingTime,
+	double _processorUse, _throughput, _avgWaitingTime, lastUpdate, SPEED_,
 		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;
-
-    bool EmptyQueue();
 };
 
 

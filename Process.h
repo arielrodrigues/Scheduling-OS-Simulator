@@ -10,7 +10,7 @@
 #define _getPriority(x) std::get<1>(x)
 #define _getSubmissionTime(x) std::get<2>(x)
 #define _getExecutionTime(x) std::get<3>(x)
-#define _getBlocketTime(x) std::get<4>(x)
+#define _getBlockedTime(x) std::get<4>(x)
 
 /***
  * Data structure of the process
@@ -20,10 +20,6 @@ class Process {
 public:
     Process();
     Process(std::tuple<int, int, float, float, float>);
-    void decrementExecutionTime();
-    void decrementBlockTime();
-    void decrementSubmissionTime();
-    void decrementWaitingTime();
     int getPID();
     int getPriority();
     float getSubmissionTime();
@@ -31,6 +27,8 @@ public:
     float getBlockTime();
     float getResponseTime();
     float getWaitingTime();
+    void setResponseTime(float responseTime);
+    void setWaitingTime(float waitingTime);
 
 private:
     int PID, priority;
