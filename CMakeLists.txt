@@ -8,5 +8,6 @@ set(SOURCE_FILES
         Process.cpp
         sOS-Sim.cpp
         Algorithms.h
+        FileManager.h
         )
 add_executable(Simple_OS_Simulator ${SOURCE_FILES})
