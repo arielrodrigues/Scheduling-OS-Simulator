@@ -25,6 +25,7 @@ Simulator::Simulator(int maxMultiprogramming, int speed, bool debugmode) {
     this->_avgTurnaroundTime = 0;
     this->_avgServiceTime = 0;
     this->_throughput = 0;
+    this->_cpuIdleTime = 0;
 }
 
 /**
@@ -32,7 +33,7 @@ Simulator::Simulator(int maxMultiprogramming, int speed, bool debugmode) {
  * @param _process
  * @return success
  */
-bool Simulator::StartProcess(std::tuple<int, int, float, float, float> _process) {
+bool Simulator::StartProcess(std::tuple<int, int, double, double, double> _process) {
     try {
         Process process(_process);
         // create process in readyqueue (if submission time == 0) or send for incomingqueue (else)
@@ -76,11 +77,12 @@ void Simulator::CheckIncomingQueue() {
 void Simulator::CheckProcessRunning() {
     for (auto i = runningList.size(); i-- > 0;) {
         if (runningList[i].getWaitingTime() == 0) runningList[i].setWaitingTime(_elapsedTime);
-        if (remainingExecutionTime(runningList[i]) <= 0) { // move to blockedQueue
+        if (remainingExecutionTime(runningList[i]) <= 0 || runningList[i].getQuantum() <= 0) { // move to blockedQueue
             blockedQueue.push_back(runningList[i]);
             runningList.erase(runningList.begin() + i); processRunningCounter--;
             DebugLog(_elapsedTime, ("Processo " + std::to_string(runningList[i].getPID()) + " bloqueado"));
-        }
+            runningList[i].setLasTimeRunning(_elapsedTime);
+        } else if (runningList[i].getQuantum() >= 0) runningList[i].decrementQuantum();
     }
 }
 
@@ -126,16 +128,17 @@ bool Simulator::EmptyQueue() {
  * @param process - a vector of tuples with information of process
  */
 void Simulator::StartSimulation(bool (*algorithm)(std::vector<Process>*, std::vector<Process>*, double),
-        std::vector<std::tuple<int, int, float, float, float>> process) {
+        std::vector<std::tuple<int, int, double, double, double>> process) {
 
     DebugLog("Inicio da simulação:");
-    for (std::tuple<int, int, float, float, float> _process : process)
+    for (std::tuple<int, int, double, double, double> _process : process)
         StartProcess(_process);
 
     for (; !EmptyQueue(); UpdateTime())
         if (processRunningCounter < maxProcessMultiprogramming)
-            if (!algorithm(&readyQueue, &runningList, _elapsedTime))
-                std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
+            if (algorithm(&readyQueue, &runningList, _elapsedTime))
+                processRunningCounter = (int) (runningList.size() - 1);
+            else _cpuIdleTime++;
 
     CalcStatistics();
 }
@@ -145,8 +148,8 @@ void Simulator::StartSimulation(bool (*algorithm)(std::vector<Process>*, std::ve
  */
 void Simulator::CalcStatistics() {
     DebugLog(_elapsedTime, "Fim da simulação\n*******************************\nCalculando estatísticas");
-    _processorUse = 0;
-    _throughput = 0;
+    _processorUse = (_elapsedTime - _cpuIdleTime) / _elapsedTime * 100;
+    _throughput = countProcess / _elapsedTime;
     _avgWaitingTime /= countProcess;
     _avgResponseTime /= countProcess;
     _avgTurnaroundTime /= countProcess;
@@ -161,8 +164,7 @@ std::string Simulator::getResults() {
     out << "*******************************\n";
     out << "Duração da Simulação: " << _elapsedTime << "\nEficiência: " << _processorUse
         << "\nVazão: " << _throughput << "\nTempo médio de espera: " << _avgWaitingTime
-        << "\nTempo médio de resposta: " << _avgResponseTime
-        << "\nTempo médio de retorno: " << _avgTurnaroundTime
+        << "\nTempo médio de resposta: " << _avgResponseTime << "\nTempo médio de retorno: " << _avgTurnaroundTime
         << "\nTempo médio de serviço: " << _avgServiceTime;
     return out.str();
 }

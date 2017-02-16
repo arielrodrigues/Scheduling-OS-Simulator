@@ -19,20 +19,26 @@
 class Process {
 public:
     Process();
-    Process(std::tuple<int, int, float, float, float>);
+    Process(std::tuple<int, int, double, double, double>);
     int getPID();
     int getPriority();
-    float getSubmissionTime();
-    float getExecutionTime();
-    float getBlockTime();
-    float getResponseTime();
-    float getWaitingTime();
-    void setResponseTime(float responseTime);
-    void setWaitingTime(float waitingTime);
+    int getQuantum();
+    double getLastTimeRunning();
+    double getSubmissionTime();
+    double getExecutionTime();
+    double getBlockTime();
+    double getResponseTime();
+    double getWaitingTime();
+    void setResponseTime(double responseTime);
+    void setWaitingTime(double waitingTime);
+    void setLasTimeRunning(double lastTimeRunning);
+    void setQuantum(int quantum);
+    void decrementQuantum();
+    void updateWaitingTime(double waitingTime);
 
 private:
-    int PID, priority;
-    float submissionTime, executionTime, blockTime, waitingTime, responseTime;
+    int PID, priority, quantum;
+    double submissionTime, executionTime, blockTime, waitingTime, responseTime, lastTimeRunning;
 };
 
 

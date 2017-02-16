@@ -17,9 +17,11 @@ namespace Algorithms {
                                     "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
                 runningList->push_back((*readyQueue)[0]);
                 readyQueue->erase(readyQueue->begin());
-            } return true;
+                return true;
+            } else return false;
         }
         catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
             return false;
         }
     }
@@ -43,14 +45,16 @@ namespace Algorithms {
                                     "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
                 runningList->push_back((*readyQueue)[hrr]);
                 readyQueue->erase(readyQueue->begin()+hrr);
-            } return true;
+                return true;
+            } else return false;
         }
         catch (...){
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
             return false;
         }
     }
 
-    static bool Priority(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
+    static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
                 int maiorprioridade = 0, prioridade = 0, i = 0;
@@ -65,21 +69,20 @@ namespace Algorithms {
                                     "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
                 runningList->push_back((*readyQueue)[maiorprioridade]);
                 readyQueue->erase(readyQueue->begin()+maiorprioridade);
-            } return true;
+                return true;
+            } else return false;
         }
         catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
             return false;
         }
     }
 
-    static bool Lottery(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
+    static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
                 int i = 0, initickets = 0, ticketatual = 0, winner = 0, processo = 0;
-                for (Process process: (*readyQueue)) {
-                    process.setQuantum(2);
-                    ticketatual += (process.getPriority() + 1) * 10;
-                }
+                for (Process process: (*readyQueue)) ticketatual += (process.getPriority() + 1) * 10;
                 int *tickets = new int [ticketatual];
                 ticketatual = 0;
                 for (Process process: (*readyQueue)) {
@@ -95,28 +98,32 @@ namespace Algorithms {
                 processo = tickets[winner];
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readyQueue)[processo].getPID()) + " em execução");
+                (*readyQueue)[processo].setQuantum(2);
+                (*readyQueue)[processo].updateWaitingTime((*readyQueue)[processo].getLastTimeRunning() - _elapsedTime);
                 runningList->push_back((*readyQueue)[processo]);
                 readyQueue->erase(readyQueue->begin()+processo);
-            } return true;
+                return true;
+            } else return false;
         }
         catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
             return false;
         }
     }
 
     static bool RR(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
         try {
-            if (!readyQueue->empty()){
-                for (Process process: (*readyQueue)) {
-                    process.setQuantum(4);
-                }
+            if (!readyQueue->empty()) {
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
+                (*readyQueue)[0].setQuantum(4);
+                (*readyQueue)[0].updateWaitingTime((*readyQueue)[0].getLastTimeRunning() - _elapsedTime);
                 runningList->push_back((*readyQueue)[0]);
                 readyQueue->erase(readyQueue->begin());
-            } return true;
-        }
-        catch (...) {
+                return true;
+            } else return false;
+        } catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
             return false;
         }
     }

@@ -9,9 +9,11 @@ Process::Process() {
 
     this->waitingTime = 0;
     this->responseTime = 0;
+    this->quantum = 0;
+    this->lastTimeRunning = 0;
 }
 
-Process::Process(std::tuple<int, int, float, float, float> _process) {
+Process::Process(std::tuple<int, int, double, double, double> _process) {
     this->PID = _getPID(_process);
     this->priority = _getPriority(_process);
     this->submissionTime = _getSubmissionTime(_process);
@@ -19,6 +21,8 @@ Process::Process(std::tuple<int, int, float, float, float> _process) {
     this->blockTime = _getBlockedTime(_process);
     this->waitingTime = 0;
     this->responseTime = 0;
+    this->quantum = 0;
+    this->lastTimeRunning = 0;
 }
 
 int Process::getPID() {
@@ -29,30 +33,54 @@ int Process::getPriority() {
     return priority;
 }
 
-float Process::getSubmissionTime() {
+int Process::getQuantum() {
+    return quantum;
+}
+
+double Process::getLastTimeRunning() {
+    return lastTimeRunning;
+}
+
+double Process::getSubmissionTime() {
     return submissionTime;
 }
 
-float Process::getExecutionTime() {
+double Process::getExecutionTime() {
     return executionTime;
 }
 
-float Process::getBlockTime() {
+double Process::getBlockTime() {
     return blockTime;
 }
 
-float Process::getResponseTime() {
+double Process::getResponseTime() {
     return responseTime;
 }
 
-float Process::getWaitingTime() {
+double Process::getWaitingTime() {
     return waitingTime;
 }
 
-void Process::setResponseTime(float responseTime) {
+void Process::setResponseTime(double responseTime) {
     this->responseTime = responseTime - this->submissionTime;
 }
 
-void Process::setWaitingTime(float waitingTime) {
+void Process::setWaitingTime(double waitingTime) {
     this->waitingTime = waitingTime - this->submissionTime;
+}
+
+void Process::setQuantum(int quantum) {
+    this->quantum = quantum;
+}
+
+void Process::setLasTimeRunning(double lastTimeRunning) {
+    this->lastTimeRunning = lastTimeRunning;
+}
+
+void Process::decrementQuantum() {
+    this->quantum--;
+}
+
+void Process::updateWaitingTime(double waitingTime) {
+    this->waitingTime += waitingTime;
 }
