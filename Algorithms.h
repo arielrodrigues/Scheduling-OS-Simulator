@@ -1,6 +1,8 @@
 #ifndef SIMPLE_OS_SIMULATOR_ALGORITHMS_H
 #define SIMPLE_OS_SIMULATOR_ALGORITHMS_H
 
+#define firstTimeRunning(_process) _process.getResponseTime() == -1
+
 #include <vector>
 #include <ctime>
 #include <cstdlib>
@@ -10,6 +12,11 @@
 
 namespace Algorithms {
 
+	/***
+	 * First-Come-First-Served (FCFS) scheduling algorithm [also know as First-In-Fist-Out (FIFO)]
+	 * Used to medium-term Scheduling
+	 * @return (*readysuspendedQueue)[0]
+	 */
     static bool FCFS(std::vector<Process>* readysuspendedQueue, std::vector<Process>* readyQueue, double _elapsedTime) {
         try {
             if (!readysuspendedQueue->empty()) {
@@ -27,28 +34,36 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * High-Response-Ration-Next (HRRN) scheduling algorithm
+	 * Used to short-term Scheduling
+	 * @return process with max((executionTime + waitingTime)/executionTime) in readyQueue
+	 */
     static bool HRRN(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                double responseratio = 0, maior = 0;
                 int i = 0, hrr = 0;
-                for (Process process: (*readyQueue)) {
-                    process.setWaitingTime(_elapsedTime);
-                    responseratio = 1 + process.getWaitingTime() / process.getExecutionTime();
+                for (auto responseratio = 0.0, maior = 0.0; i < (*readyQueue).size(); i++) {
+	                (*readyQueue)[i].setWaitingTime(_elapsedTime);
+                    responseratio = 1 + (*readyQueue)[i].getWaitingTime() / (*readyQueue)[i].getExecutionTime();
                     if (responseratio > maior) {
                         maior = responseratio;
                         hrr = i;
-                    }i++;
+                    }
                 }
 
+	            // set Quantum as limitless
                 (*_quantum) = std::numeric_limits<int>::max();
-	            if ((*readyQueue)[hrr].getResponseTime() == -1)
-		            (*readyQueue)[hrr].setResponseTime(_elapsedTime);
+	            // set response time
+	            if (firstTimeRunning((*readyQueue)[hrr])) (*readyQueue)[hrr].setResponseTime(_elapsedTime);
 
+
+	            Simulator::DebugLog(_elapsedTime,
+	                                "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
+
+	            // set as running process
                 runningList->push_back((*readyQueue)[hrr]);
                 readyQueue->erase(readyQueue->begin()+hrr);
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
                 return true;
             } else return false;
         }
@@ -58,25 +73,32 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * Priority scheduling algorithm
+	 * Used to short-term Scheduling
+	 * @return process with min(priority) in readyQueue
+	 */
     static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                int maiorprioridade = 0, prioridade = 0, i = 0;
+                int minpriority = 0, priority = 0, i = 0;
                 for (Process process: (*readyQueue)) {
-                    if (process.getPriority() < prioridade) {
-                        prioridade = process.getPriority();
-                        maiorprioridade = i;
+                    if (process.getPriority() < priority) {
+                        priority = process.getPriority();
+                        minpriority = i;
                     } i++;
                 }
 
+	            // set Quantum as limitless
 	            (*_quantum) = std::numeric_limits<int>::max();
-				if ((*readyQueue)[maiorprioridade].getResponseTime() == -1)
-					(*readyQueue)[maiorprioridade].setResponseTime(_elapsedTime);
+	            // set response time
+	            if (firstTimeRunning((*readyQueue)[minpriority])) (*readyQueue)[minpriority].setResponseTime(_elapsedTime);
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
+	                                "Processo " + std::to_string((*readyQueue)[minpriority].getPID()) + " em execução");
 
-                runningList->push_back((*readyQueue)[maiorprioridade]);
-                readyQueue->erase(readyQueue->begin()+maiorprioridade);
+	            // set as running process
+                runningList->push_back((*readyQueue)[minpriority]);
+                readyQueue->erase(readyQueue->begin()+minpriority);
                 return true;
             } else return false;
         }
@@ -86,33 +108,42 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * Lottery scheduling algorithm w/ quantum = 2
+	 * Used to short-term Scheduling
+	 * @return a semi-randomly chosen process, each process has (process_priority+1)*10 tickets
+	 */
     static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                int i = 0, initickets = 0, ticketatual = 0, winner = 0, processo = 0;
-                for (Process process: (*readyQueue)) ticketatual += (process.getPriority() + 1) * 10;
-                int *tickets = new int [ticketatual];
-                ticketatual = 0;
+                int i = 0, initickets = 0, countTickets = 0, winner = 0;
+
+	            // initialize vector of tickets
+                for (Process process: (*readyQueue)) countTickets += (process.getPriority() + 1) * 10;
+                int *tickets = new int [countTickets]; countTickets = 0;
+
+	            // make semi-random choice
                 for (Process process: (*readyQueue)) {
-                    initickets = ticketatual;
-                    ticketatual += (process.getPriority() + 1) * 10;
-                    for (int j = initickets; j < ticketatual; j++){
+                    initickets = countTickets;
+                    countTickets += (process.getPriority() + 1) * 10;
+                    for (int j = initickets; j < countTickets; j++){
                         tickets[j] = i;
-                    }
-                    i++;
+                    } i++;
                 }
                 srand((unsigned)time(0));
-                winner = rand()%(ticketatual + 1);
-                processo = tickets[winner];
+                winner = tickets[rand()%(countTickets + 1)];
 
+	            // set Quantum as 2
                 (*_quantum) = 2;
-	            if ((*readyQueue)[processo].getResponseTime() == -1)
-		            (*readyQueue)[processo].setResponseTime(_elapsedTime);
+	            // set response time
+	            if (firstTimeRunning((*readyQueue)[winner])) (*readyQueue)[winner].setResponseTime(_elapsedTime);
 
-	            runningList->push_back((*readyQueue)[processo]);
-                readyQueue->erase(readyQueue->begin()+processo);
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[processo].getPID()) + " em execução");
+	            Simulator::DebugLog(_elapsedTime,
+	                                "Processo " + std::to_string((*readyQueue)[winner].getPID()) + " em execução");
+
+	            // set as running process
+	            runningList->push_back((*readyQueue)[winner]);
+                readyQueue->erase(readyQueue->begin()+winner);
                 return true;
             } else return false;
         }
@@ -122,18 +153,26 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * Round Robin (RR) scheduling algorithm w/ quantum = 4
+	 * Used to short-term Scheduling
+	 * @return (*readyQueue)[0]
+	 */
     static bool RR(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
 
-                (*_quantum) = 4;
-	            if ((*readyQueue)[0].getResponseTime() == -1)
-		            (*readyQueue)[0].setResponseTime(_elapsedTime);
+	            // set Quantum as 4
+	            (*_quantum) = 4;
+				// set response time
+	            if (firstTimeRunning((*readyQueue)[0])) (*readyQueue)[0].setResponseTime(_elapsedTime);
 
+	            Simulator::DebugLog(_elapsedTime,
+	                                "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
+
+	            // set process as running
 	            runningList->push_back((*readyQueue)[0]);
                 readyQueue->erase(readyQueue->begin());
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
                 return true;
             } else return false;
         } catch (...) {
