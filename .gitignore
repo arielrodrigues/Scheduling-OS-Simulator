@@ -72,3 +72,5 @@ cmake-build-debug/Project.cbp
 *.iml
 *.rsp
 cmake-build-debug/CMakeFiles/3.6.3/CMakeRCCompiler.cmake
+
+\.idea/
