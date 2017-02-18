@@ -46,6 +46,6 @@ int main() {
     bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::PRIORITY;
     bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::LOTTERY;
 
-    sim.StartSimulation(RR, process);
+    sim.StartSimulation(HRRN, process);
     return 0;
 }

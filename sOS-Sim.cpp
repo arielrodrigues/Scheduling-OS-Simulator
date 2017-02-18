@@ -158,11 +158,10 @@ void Simulator::StartSimulation(
             if (noProcessRunning())
                 _cpuIdle = !shortTermSchedulingAlgorithm(&readyQueue, &runningProcess, &_quantum, _elapsedTime);
 
-            if (_cpuIdle && noProcessRunning()) _cpuIdleTime++;
-
             // Update counters
             _elapsedTime++;
 	        decrementQuantum();
+            if (_cpuIdle && noProcessRunning()) _cpuIdleTime++; // Is cpu idle?
         }
 
     CalcStatistics();
