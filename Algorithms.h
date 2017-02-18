@@ -1,22 +1,26 @@
 #ifndef SIMPLE_OS_SIMULATOR_ALGORITHMS_H
 #define SIMPLE_OS_SIMULATOR_ALGORITHMS_H
-#include "sOS-Sim.h"
-
 
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include <limits>
 #include "Process.h"
+#include "sOS-Sim.h"
 
 namespace Algorithms {
 
-    static bool FCFS(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
+    static bool FCFS(std::vector<Process>* readysuspendedQueue, std::vector<Process>* readyQueue, double _elapsedTime) {
         try {
-            if (!readyQueue->empty()) {
+            if (!readysuspendedQueue->empty()) {
                 Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
-                runningList->push_back((*readyQueue)[0]);
-                readyQueue->erase(readyQueue->begin());
+                                    "Processo " + std::to_string((*readysuspendedQueue)[0].getPID()) + " pronto");
+
+	            if ((*readyQueue)[0].getResponseTime() == -1)
+		            (*readyQueue)[0].setResponseTime(_elapsedTime);
+
+	            readyQueue->push_back((*readysuspendedQueue)[0]);
+                readysuspendedQueue->erase(readysuspendedQueue->begin());
                 return true;
             } else return false;
         }
@@ -26,7 +30,7 @@ namespace Algorithms {
         }
     }
 
-    static bool HRRN(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
+    static bool HRRN(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
                 double responseratio = 0, maior = 0;
@@ -41,10 +45,15 @@ namespace Algorithms {
                     }
                     i++;
                 }
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
+
+                (*_quantum) = std::numeric_limits<int>::max();
+	            if ((*readyQueue)[hrr].getResponseTime() == -1)
+		            (*readyQueue)[hrr].setResponseTime(_elapsedTime);
+
                 runningList->push_back((*readyQueue)[hrr]);
                 readyQueue->erase(readyQueue->begin()+hrr);
+                Simulator::DebugLog(_elapsedTime,
+                                    "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
                 return true;
             } else return false;
         }
@@ -54,7 +63,7 @@ namespace Algorithms {
         }
     }
 
-    static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, double _elapsedTime) {
+    static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
                 int maiorprioridade = 0, prioridade = 0, i = 0;
@@ -65,10 +74,15 @@ namespace Algorithms {
                     }
                     i++;
                 }
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
+
+	            (*_quantum) = std::numeric_limits<int>::max();
+				if ((*readyQueue)[maiorprioridade].getResponseTime() == -1)
+					(*readyQueue)[maiorprioridade].setResponseTime(_elapsedTime);
+
                 runningList->push_back((*readyQueue)[maiorprioridade]);
                 readyQueue->erase(readyQueue->begin()+maiorprioridade);
+                Simulator::DebugLog(_elapsedTime,
+                                    "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
                 return true;
             } else return false;
         }
@@ -78,7 +92,7 @@ namespace Algorithms {
         }
     }
 
-    static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, double _elapsedTime) {
+    static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
                 int i = 0, initickets = 0, ticketatual = 0, winner = 0, processo = 0;
@@ -96,12 +110,15 @@ namespace Algorithms {
                 srand((unsigned)time(0));
                 winner = rand()%(ticketatual + 1);
                 processo = tickets[winner];
+
+                (*_quantum) = 2;
+	            if ((*readyQueue)[processo].getResponseTime() == -1)
+		            (*readyQueue)[processo].setResponseTime(_elapsedTime);
+
+	            runningList->push_back((*readyQueue)[processo]);
+                readyQueue->erase(readyQueue->begin()+processo);
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readyQueue)[processo].getPID()) + " em execução");
-                (*readyQueue)[processo].setQuantum(2);
-                (*readyQueue)[processo].updateWaitingTime((*readyQueue)[processo].getLastTimeRunning() - _elapsedTime);
-                runningList->push_back((*readyQueue)[processo]);
-                readyQueue->erase(readyQueue->begin()+processo);
                 return true;
             } else return false;
         }
@@ -111,15 +128,18 @@ namespace Algorithms {
         }
     }
 
-    static bool RR(std::vector<Process>* readyQueue, std::vector<Process>* runningList, double _elapsedTime) {
+    static bool RR(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
+
+                (*_quantum) = 4;
+	            if ((*readyQueue)[0].getResponseTime() == -1)
+		            (*readyQueue)[0].setResponseTime(_elapsedTime);
+
+	            runningList->push_back((*readyQueue)[0]);
+                readyQueue->erase(readyQueue->begin());
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
-                (*readyQueue)[0].setQuantum(4);
-                (*readyQueue)[0].updateWaitingTime((*readyQueue)[0].getLastTimeRunning() - _elapsedTime);
-                runningList->push_back((*readyQueue)[0]);
-                readyQueue->erase(readyQueue->begin());
                 return true;
             } else return false;
         } catch (...) {

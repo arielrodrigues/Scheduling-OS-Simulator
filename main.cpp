@@ -6,37 +6,45 @@
 #include "Algorithms.h"
 #include "FileManager.h"
 
-std::vector<std::tuple<int, int, double, double, double>> process;
+std::vector<std::tuple<int, double, int, double, double>> process;
 
-void filetoTuple(std::string filename) {
+
+/**
+ * Reads the file, takes the tuples from the processes and places them in a vector;
+ * Each process is a tuple with PID, Submission time, Priority, Execution time and Block time, respectively.
+ * @param filename
+ */
+
+void filetoVectorofTuples(std::string filename) {
     using namespace FileManager;
 
     std::ifstream file(filename.c_str(), std::ifstream::in);
     double submissionTime, executionTime, blockTime;
     int PID, priority;
-    std::string buffer, PIDbuff, prioritybuff;
+    char delichar;
 
     std::stringstream ss = readFile(filename);
-    //for (auto i = 0; ss.peek() == (decltype(ss))::traits_type::eof(); i++) {
-    ss.seekp(0, std::ios::end);
-    for (auto i = 0; i < ss.tellp(); i++) {
-        ss >> PID >> priority >> submissionTime >> executionTime >> blockTime;
-        std::cout << PID << " " << priority << " " << submissionTime << " " << executionTime << " " << blockTime << "\n";
-        process.push_back(std::tuple<int, int, double, double, double>(PID, priority, submissionTime,
-                                                                    executionTime, blockTime));
+    while (ss.good()) {
+        ss >> PID >> submissionTime >> priority >> executionTime >> blockTime >> delichar;
+	    std::cout << PID << " " << submissionTime << " " << priority << " " << executionTime << " " << blockTime << "\n";
+        process.push_back(std::tuple<int, double, int, double, double>(PID, submissionTime, priority,
+                                                                       executionTime, blockTime));
     }
 }
 
 int main() {
-    Simulator sim(1, 1, true);
-    bool (*FCFS)(std::vector <Process>*, std::vector<Process>*, double) = Algorithms::FCFS;
-    bool (*RR)(std::vector <Process>*, std::vector<Process>*, double) = Algorithms::RR;
-    bool (*HRRN)(std::vector <Process>*, std::vector<Process>*, double) = Algorithms::HRRN;
-    bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, double) = Algorithms::PRIORITY;
-    bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, double) = Algorithms::LOTTERY;
-    filetoTuple("/home/ariel/ClionProjects/Simple-OS-Simulator/teste.txt");
 
-    sim.StartSimulation(RR, process);
-    std::cout << sim.getResults() << std::endl;
+    filetoVectorofTuples("/home/ariel/ClionProjects/Simple-OS-Simulator/teste.txt");
+    bool step_by_step = false, debug_mode = true;
+    Simulator sim(1, step_by_step, debug_mode);
+
+    // Algorithms
+    //bool (*FCFS)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::FCFS;
+    bool (*RR)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::RR;
+    bool (*HRRN)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::HRRN;
+    bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::PRIORITY;
+    bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::LOTTERY;
+
+    sim.StartSimulation(HRRN, process);
     return 0;
 }

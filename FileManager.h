@@ -6,10 +6,16 @@
 #include <iostream>
 
 namespace FileManager {
-    static std::stringstream readFile(std::string filename) {
+
+    /***
+     * Put the file in a stringstream
+     * @param filepath
+     * @return out (file stringstream)
+     */
+    static std::stringstream readFile(std::string filepath) {
         try {
             std::stringstream out;
-            std::ifstream infile(filename);
+            std::ifstream infile(filepath);
             for (std::string line; getline(infile, line);
                  boost::replace_all(line, ",", " "), out << line << "\n");
             return out;
@@ -19,6 +25,12 @@ namespace FileManager {
         }
     }
 
+    /***
+     * Write the stringstream content in a file
+     * @param filename
+     * @param content
+     * @return sucess?
+     */
     static bool writeFile(std::string filename, std::stringstream content) {
         try {
             std::ofstream outfile(filename);
