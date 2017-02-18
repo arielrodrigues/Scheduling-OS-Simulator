@@ -16,9 +16,6 @@ namespace Algorithms {
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readysuspendedQueue)[0].getPID()) + " pronto");
 
-	            if ((*readyQueue)[0].getResponseTime() == -1)
-		            (*readyQueue)[0].setResponseTime(_elapsedTime);
-
 	            readyQueue->push_back((*readysuspendedQueue)[0]);
                 readysuspendedQueue->erase(readysuspendedQueue->begin());
                 return true;
@@ -37,13 +34,11 @@ namespace Algorithms {
                 int i = 0, hrr = 0;
                 for (Process process: (*readyQueue)) {
                     process.setWaitingTime(_elapsedTime);
-                    responseratio =
-                            (process.getExecutionTime() + process.getWaitingTime()) / process.getExecutionTime();
+                    responseratio = 1 + process.getWaitingTime() / process.getExecutionTime();
                     if (responseratio > maior) {
                         maior = responseratio;
                         hrr = i;
-                    }
-                    i++;
+                    }i++;
                 }
 
                 (*_quantum) = std::numeric_limits<int>::max();
@@ -68,21 +63,20 @@ namespace Algorithms {
             if (!readyQueue->empty()) {
                 int maiorprioridade = 0, prioridade = 0, i = 0;
                 for (Process process: (*readyQueue)) {
-                    if (process.getPriority() > prioridade) {
+                    if (process.getPriority() < prioridade) {
                         prioridade = process.getPriority();
                         maiorprioridade = i;
-                    }
-                    i++;
+                    } i++;
                 }
 
 	            (*_quantum) = std::numeric_limits<int>::max();
 				if ((*readyQueue)[maiorprioridade].getResponseTime() == -1)
 					(*readyQueue)[maiorprioridade].setResponseTime(_elapsedTime);
+	            Simulator::DebugLog(_elapsedTime,
+	                                "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
 
                 runningList->push_back((*readyQueue)[maiorprioridade]);
                 readyQueue->erase(readyQueue->begin()+maiorprioridade);
-                Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[maiorprioridade].getPID()) + " em execução");
                 return true;
             } else return false;
         }

@@ -57,8 +57,8 @@ double Process::getTurnaroundTime() {
 	return turnaroundTime;
 }
 
-void Process::setResponseTime(double responseTime) {
-    this->responseTime = responseTime - this->submissionTime;
+void Process::setResponseTime(double _elapsedTime) {
+    this->responseTime = _elapsedTime - this->submissionTime;
 }
 
 void Process::setWaitingTime(double _elapsedTime) {

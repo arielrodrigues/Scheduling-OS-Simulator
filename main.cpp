@@ -35,8 +35,9 @@ void filetoVectorofTuples(std::string filename) {
 int main() {
 
     filetoVectorofTuples("/home/ariel/ClionProjects/Simple-OS-Simulator/teste.txt");
+    int alfa = 100; // max process multiprogramming
     bool step_by_step = false, debug_mode = true;
-    Simulator sim(1, step_by_step, debug_mode);
+    Simulator sim(alfa, step_by_step, debug_mode);
 
     // Algorithms
     //bool (*FCFS)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::FCFS;
@@ -45,6 +46,6 @@ int main() {
     bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::PRIORITY;
     bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::LOTTERY;
 
-    sim.StartSimulation(HRRN, process);
+    sim.StartSimulation(RR, process);
     return 0;
 }

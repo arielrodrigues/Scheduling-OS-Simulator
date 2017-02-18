@@ -11,9 +11,10 @@
 #ifndef SIMPLE_OS_SIMULATOR_SIMULATOR_H
 #define SIMPLE_OS_SIMULATOR_SIMULATOR_H
 
-#define remainingTime(_process) _process.getExecutionTime() < 1 && _process.getBlockTime() < 1
+#define noRemainingTime(_process) _process.getExecutionTime() < 1 && _process.getBlockTime() < 1
 #define remainingSubmissionTime(_process) _process.getSubmissionTime() - _elapsedTime
 #define decrementQuantum() _quantum--
+#define noProcessRunning() runningProcess.size() < 1
 
 
 class Simulator {

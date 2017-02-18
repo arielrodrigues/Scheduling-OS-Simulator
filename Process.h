@@ -28,7 +28,7 @@ public:
     double getResponseTime();
     double getWaitingTime();
 	double getTurnaroundTime();
-    void setResponseTime(double responseTime);
+    void setResponseTime(double _elapsedTime);
     void setWaitingTime(double _elapsedTime);
 	void setTurnaroundTime(double _elapsedTime);
 	void decrementExecutionTime() {if (executionTime > 0) --executionTime;};

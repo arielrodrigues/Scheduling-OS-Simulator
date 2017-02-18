@@ -43,8 +43,7 @@ bool Simulator::StartProcess(std::tuple<int, double, int, double, double> _proce
     try {
         Process process(_process);
         if (process.getSubmissionTime() == 0)
-            readyQueue.size() >= 100 ? readysuspendQueue.push_back(process) : readyQueue.push_back(process),
-                    DebugLog(_elapsedTime,"Processo "+std::to_string(process.getPID())+" pronto");
+            readyQueue.size() >= 100 ? readysuspendQueue.push_back(process) : readyQueue.push_back(process);
         else incomingQueue.push_back(process);
         countProcess++;
         return true;
@@ -73,7 +72,7 @@ void Simulator::CheckIncomingQueue() {
         if (remainingSubmissionTime(incomingQueue[i]) <= 0) { // move to readyQueue
             readysuspendQueue.push_back(incomingQueue[i]);
             incomingQueue.erase(incomingQueue.begin() + i);
-            DebugLog(_elapsedTime, "Processo " + std::to_string(incomingQueue[i].getPID()) + " pronto");
+            DebugLog(_elapsedTime, "Processo " + std::to_string(incomingQueue[i].getPID()) + " submetido");
         }
     }
 }
@@ -101,13 +100,13 @@ void Simulator::CheckRunningProcess() {
  */
 void Simulator::CheckBlockedQueue() {
     for (auto i = blockedQueue.size(); i-- > 0;) {
-        if (remainingTime(blockedQueue[i])) { // terminate process
+        blockedQueue[i].decrementBlockTime();
+        if (noRemainingTime(blockedQueue[i])) { // terminate process
             blockedQueue[i].setTurnaroundTime(_elapsedTime);
             blockedQueue[i].setWaitingTime(_elapsedTime);
             TerminateProcess(blockedQueue[i]);
             blockedQueue.erase(blockedQueue.begin() + i);
         }
-        blockedQueue[0].decrementBlockTime();
     }
 }
 
@@ -143,6 +142,9 @@ void Simulator::StartSimulation(
     for (std::tuple<int, double, int, double, double> _process : process)
         StartProcess(_process);
 
+	// Clear vector of tuples
+	process.clear();
+
     for (;!EmptyQueue(); lastUpdate = time(NULL))
         if (time(NULL) - lastUpdate >= SPEED_) {
             // Check queues
@@ -153,11 +155,12 @@ void Simulator::StartSimulation(
                 Algorithms::FCFS(&readysuspendQueue, &readyQueue, _elapsedTime);
 
             // Short-term scheduling
-            if (runningProcess.size() < 1)
+            if (noProcessRunning())
                 _cpuIdle = !shortTermSchedulingAlgorithm(&readyQueue, &runningProcess, &_quantum, _elapsedTime);
 
+            if (_cpuIdle && noProcessRunning()) _cpuIdleTime++;
+
             // Update counters
-            if (_cpuIdle) _cpuIdleTime++;
             _elapsedTime++;
 	        decrementQuantum();
         }
@@ -170,7 +173,7 @@ void Simulator::StartSimulation(
  * Calc statistics and update variables
  */
 void Simulator::CalcStatistics() {
-    --_elapsedTime;
+    --_elapsedTime; --_cpuIdleTime;
     DebugLog("\nFim da simulação\n*******************************\nCalculando estatísticas");
     _processorUse = std::round((static_cast<double>(_elapsedTime) - _cpuIdleTime) / _elapsedTime * 100);
     _throughput = std::round(static_cast<double>(countProcess) / _elapsedTime * 100);
