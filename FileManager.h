@@ -7,6 +7,7 @@
 
 namespace FileManager {
 
+	static uint32_t numberofLines = 0;
     /***
      * Put the file in a stringstream
      * @param filepath
@@ -17,7 +18,7 @@ namespace FileManager {
             std::stringstream out;
             std::ifstream infile(filepath);
             for (std::string line; getline(infile, line);
-                 boost::replace_all(line, ",", " "), out << line << "\n");
+                 boost::replace_all(line, ",", " "), out << line << '\n', numberofLines++);
             return out;
         } catch (...) {
             std::cout << "Erro ao abrir o arquivo de leitura\n";
@@ -31,10 +32,11 @@ namespace FileManager {
      * @param content
      * @return sucess?
      */
-    static bool writeFile(std::string filename, std::stringstream content) {
+    static bool writeFile(std::string filename, std::string content_) {
         try {
             std::ofstream outfile(filename);
-            outfile << content.rdbuf();
+            std::stringstream content(content_);
+            outfile << content.str();
             return true;
         } catch (...) {
             std::cout << "Erro ao escrever no arquivo\n";

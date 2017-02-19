@@ -12,6 +12,8 @@
 
 namespace Algorithms {
 
+	static uint32_t maxProcessMultiprogramming = 0;
+
 	/***
 	 * First-Come-First-Served (FCFS) scheduling algorithm [also know as First-In-Fist-Out (FIFO)]
 	 * Used to medium-term Scheduling
@@ -81,7 +83,7 @@ namespace Algorithms {
     static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                int maxpriority = 0, priority = 0, i = 0;
+                int maxpriority = (*readyQueue)[0].getPriority(), priority = 0, i = 0;
                 for (Process process: (*readyQueue)) {
                     if (process.getPriority() > priority) {
                         priority = process.getPriority();
@@ -113,7 +115,7 @@ namespace Algorithms {
 	 * Used to short-term Scheduling
 	 * @return a semi-randomly chosen process, each process has (process_priority+1)*10 tickets
 	 */
-    static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
+    static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime)  {
         try {
             if (!readyQueue->empty()) {
                 uint32_t countTickets = 0, winner = 0, i = 0;
@@ -184,6 +186,11 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * State Dependent (SD) scheduling algorithm w/ quantum = maxProcessMultiprogramming / size(readyQueue)
+	 * Used to short-term Scheduling
+	 * @return (*readyQueue)[0]
+	 */
     static bool SD(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
@@ -207,6 +214,11 @@ namespace Algorithms {
         }
     }
 
+	/***
+	 * Feedback scheduling algorithm
+	 * Used to short-term Scheduling
+	 * @return (*readyQueue)[minpriority]
+	 */
     static bool FEEDBACK(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
@@ -217,7 +229,7 @@ namespace Algorithms {
                     else if (process.getTimesExecuted() >= 3) process.setPriority(3);
                 }
 
-                int minpriority = 0, priority = 0, i = 0;
+                int minpriority = 0, priority = (*readyQueue)[0].getPriority(), i = 0;
                 for (Process process: (*readyQueue)) {
                     if (process.getPriority() < priority) {
                         priority = process.getPriority();
@@ -232,7 +244,8 @@ namespace Algorithms {
                 else if (priority == 1) (*_quantum) = 2;
                 else if (priority == 2) (*_quantum) = 4;
                 else if (priority == 3) (*_quantum) = 8;
-                // set response time
+
+	            // set response time
                 if (firstTimeRunning((*readyQueue)[minpriority])) (*readyQueue)[minpriority].setResponseTime(_elapsedTime);
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readyQueue)[minpriority].getPID()) + " em execução");

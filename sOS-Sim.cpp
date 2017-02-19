@@ -48,7 +48,7 @@ bool Simulator::StartProcess(std::tuple<int, double, int, double, double> _proce
         countProcess++;
         return true;
     } catch (...) {
-            return false;
+        return false;
     }
 }
 
@@ -111,9 +111,9 @@ void Simulator::CheckBlockedQueue() {
 }
 
 void Simulator::CheckQueues() {
-	CheckIncomingQueue();
-	CheckBlockedQueue();
-	CheckRunningProcess();
+    CheckIncomingQueue();
+    CheckBlockedQueue();
+    CheckRunningProcess();
 }
 
 
@@ -142,8 +142,8 @@ void Simulator::StartSimulation(
     for (std::tuple<int, double, int, double, double> _process : process)
         StartProcess(_process);
 
-	// Clear vector of tuples
-	process.clear();
+    // Clear vector of tuples
+    process.clear();
 
     for (;!EmptyQueue(); lastUpdate = time(NULL))
         if (time(NULL) - lastUpdate >= SPEED_) {
@@ -151,7 +151,7 @@ void Simulator::StartSimulation(
             CheckQueues();
 
             // Medium-term scheduling
-            if (readyQueue.size() < maxProcessMultiprogramming)
+            while (readyQueue.size() < maxProcessMultiprogramming && readysuspendQueue.size() > 0)
                 Algorithms::FCFS(&readysuspendQueue, &readyQueue, _elapsedTime);
 
             // Short-term scheduling
@@ -160,7 +160,7 @@ void Simulator::StartSimulation(
 
             // Update counters
             _elapsedTime++;
-	        decrementQuantum();
+            decrementQuantum();
             if (_cpuIdle && noProcessRunning()) _cpuIdleTime++; // Is cpu idle?
         }
 

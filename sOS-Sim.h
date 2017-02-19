@@ -46,6 +46,7 @@ private:
 	// Statistics
 	double _processorUse, _throughput, _avgWaitingTime, lastUpdate, SPEED_,
 		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;
+	std::stringstream out;
 };
 
 
