@@ -184,6 +184,71 @@ namespace Algorithms {
         }
     }
 
+    static bool SD(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
+        try {
+            if (!readyQueue->empty()) {
+
+	            // set Quantum
+	            (*_quantum) = maxProcessMultiprogramming / (*readyQueue).size();
+				// set response time
+	            if (firstTimeRunning((*readyQueue)[0])) (*readyQueue)[0].setResponseTime(_elapsedTime);
+
+	            Simulator::DebugLog(_elapsedTime,
+	                                "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
+
+	            // set process as running
+	            runningList->push_back((*readyQueue)[0]);
+                readyQueue->erase(readyQueue->begin());
+                return true;
+            } else return false;
+        } catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
+            return false;
+        }
+    }
+
+    static bool FEEDBACK(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
+        try {
+            if (!readyQueue->empty()) {
+                for (Process process: (*readyQueue)){
+                    if (process.getTimesExecuted() == 0) process.setPriority(0);
+                    else if (process.getTimesExecuted() == 1) process.setPriority(1);
+                    else if (process.getTimesExecuted() == 2) process.setPriority(2);
+                    else if (process.getTimesExecuted() >= 3) process.setPriority(3);
+                }
+
+                int minpriority = 0, priority = 0, i = 0;
+                for (Process process: (*readyQueue)) {
+                    if (process.getPriority() < priority) {
+                        priority = process.getPriority();
+                        minpriority = i;
+                    } i++;
+                }
+
+                (*readyQueue)[minpriority].incrementTimesExecuted();
+
+                // set Quantum according to priority
+                if (priority == 0) (*_quantum) = 1;
+                else if (priority == 1) (*_quantum) = 2;
+                else if (priority == 2) (*_quantum) = 4;
+                else if (priority == 3) (*_quantum) = 8;
+                // set response time
+                if (firstTimeRunning((*readyQueue)[minpriority])) (*readyQueue)[minpriority].setResponseTime(_elapsedTime);
+                Simulator::DebugLog(_elapsedTime,
+                                    "Processo " + std::to_string((*readyQueue)[minpriority].getPID()) + " em execução");
+
+                // set as running process
+                runningList->push_back((*readyQueue)[minpriority]);
+                readyQueue->erase(readyQueue->begin()+minpriority);
+                return true;
+            } else return false;
+        }
+        catch (...) {
+            std::cout << "Erro no escalonamento. Nenhum processo escalonado\n";
+            return false;
+        }
+    }
+    
 }
 
 
