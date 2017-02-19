@@ -188,10 +188,13 @@ void Simulator::CalcStatistics() {
 std::string Simulator::getResults() {
     std::stringstream out;
     out << "*******************************\n";
-    out << "Duração da Simulação: " << _elapsedTime << "\nEficiência: " << _processorUse
-        << "%\nVazão: " << _throughput << "%\nTempo médio de espera: " << _avgWaitingTime
-        << "\nTempo médio de resposta: " << _avgResponseTime << "\nTempo médio de retorno: " << _avgTurnaroundTime
-        << "\nTempo médio de serviço: " << _avgServiceTime;
+    out << "Duração da Simulação (Simulation duration): " << _elapsedTime
+        << "\nUtilização do processador (CPU efficiency): " << _processorUse
+        << "%\nVazão (Throughput): " << _throughput
+        << "%\nTempo médio de espera (Average waiting time): " << _avgWaitingTime
+        << "\nTempo médio de resposta (Average response time): "
+        << _avgResponseTime << "\nTempo médio de retorno (Average turnaround time): " << _avgTurnaroundTime
+        << "\nTempo médio de serviço (Average service time): " << _avgServiceTime;
     return out.str();
 }
 

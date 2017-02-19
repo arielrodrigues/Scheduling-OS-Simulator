@@ -42,7 +42,7 @@ private:
 	bool _cpuIdle;
     int _elapsedTime, _cpuIdleTime, maxProcessMultiprogramming, countProcess;
     // Scheduling process' queues
-    std::vector<Process> blockedQueue, readyQueue, incomingQueue, runningProcess, readysuspendQueue;
+    std::vector<Process> incomingQueue, readysuspendQueue, readyQueue, runningProcess, blockedQueue;
 	// Statistics
 	double _processorUse, _throughput, _avgWaitingTime, lastUpdate, SPEED_,
 		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;
