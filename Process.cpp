@@ -6,6 +6,7 @@ Process::Process() {
     this->priority = 0;
     this->executionTime = 0;
     this->blockTime = 0;
+    this->timesExecuted = 0;
 
     this->waitingTime = 0;
     this->responseTime = 0;
@@ -21,6 +22,7 @@ Process::Process(std::tuple<int, double, int, double, double> _process) {
     this->blockTime = _getBlockedTime(_process);
     this->waitingTime = -1;
     this->responseTime = -1;
+    this->timesExecuted = 0;
 
 	executionTime__ = executionTime;
 }
@@ -35,6 +37,10 @@ double Process::getSubmissionTime() {
 
 int Process::getPriority() {
     return priority;
+}
+
+int Process::getTimesExecuted() {
+    return timesExecuted;
 }
 
 double Process::getExecutionTime() {
@@ -67,4 +73,12 @@ void Process::setWaitingTime(double _elapsedTime) {
 
 void Process::setTurnaroundTime(double _elapsedTime) {
 	this->turnaroundTime = _elapsedTime - submissionTime;
+}
+
+void Process::incrementTimesExecuted() {
+    this->timesExecuted += 1;
+}
+
+void Process::setPriority(int priority) {
+    this->priority = priority;
 }

@@ -45,6 +45,8 @@ int main() {
     bool (*HRRN)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::HRRN;
     bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::PRIORITY;
     bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::LOTTERY;
+    bool (*SD) (std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::SD;
+    bool (*FEEDBACK)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::FEEDBACK;
 
     sim.StartSimulation(LOTTERY, process);
     return 0;

@@ -22,6 +22,7 @@ public:
     Process(std::tuple<int, double, int, double, double>);
     int getPID();
     int getPriority();
+	int getTimesExecuted();
     double getSubmissionTime();
     double getExecutionTime();
     double getBlockTime();
@@ -31,12 +32,14 @@ public:
     void setResponseTime(double _elapsedTime);
     void setWaitingTime(double _elapsedTime);
 	void setTurnaroundTime(double _elapsedTime);
+	void setPriority(int priority);
+    void incrementTimesExecuted();
 	void decrementExecutionTime() {if (executionTime > 0) --executionTime;};
 	void decrementBlockTime() {if (blockTime > 0) --blockTime;};
 
 	double executionTime__;
 private:
-    int PID, priority;
+    int PID, priority, timesExecuted;
     double submissionTime, executionTime, blockTime, waitingTime, responseTime, turnaroundTime;
 };
 
