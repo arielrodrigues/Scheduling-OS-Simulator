@@ -76,29 +76,29 @@ namespace Algorithms {
 	/***
 	 * Priority scheduling algorithm
 	 * Used to short-term Scheduling
-	 * @return process with min(priority) in readyQueue
+	 * @return process with max(priority) in readyQueue
 	 */
     static bool PRIORITY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                int minpriority = 0, priority = 0, i = 0;
+                int maxpriority = 0, priority = 0, i = 0;
                 for (Process process: (*readyQueue)) {
-                    if (process.getPriority() < priority) {
+                    if (process.getPriority() > priority) {
                         priority = process.getPriority();
-                        minpriority = i;
+                        maxpriority = i;
                     } i++;
                 }
 
 	            // set Quantum as limitless
 	            (*_quantum) = std::numeric_limits<int>::max();
 	            // set response time
-	            if (firstTimeRunning((*readyQueue)[minpriority])) (*readyQueue)[minpriority].setResponseTime(_elapsedTime);
+	            if (firstTimeRunning((*readyQueue)[maxpriority])) (*readyQueue)[maxpriority].setResponseTime(_elapsedTime);
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[minpriority].getPID()) + " em execução");
+	                                "Processo " + std::to_string((*readyQueue)[maxpriority].getPID()) + " em execução");
 
 	            // set as running process
-                runningList->push_back((*readyQueue)[minpriority]);
-                readyQueue->erase(readyQueue->begin()+minpriority);
+                runningList->push_back((*readyQueue)[maxpriority]);
+                readyQueue->erase(readyQueue->begin()+maxpriority);
                 return true;
             } else return false;
         }
