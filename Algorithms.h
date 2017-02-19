@@ -116,22 +116,25 @@ namespace Algorithms {
     static bool LOTTERY(std::vector<Process> *readyQueue, std::vector<Process> *runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-                int i = 0, initickets = 0, countTickets = 0, winner = 0;
+                uint32_t countTickets = 0, winner = 0, i = 0;
 
-	            // initialize vector of tickets
-                for (Process process: (*readyQueue)) countTickets += (process.getPriority() + 1) * 10;
-                int *tickets = new int [countTickets]; countTickets = 0;
+	            // set ticket-range for each process
+	            for (; i < (*readyQueue).size(); i++) {
+		            (*readyQueue)[i].firstTicket = countTickets;
+		            countTickets += ((*readyQueue)[i].getPriority() + 1) * 10;
+		            (*readyQueue)[i].lastTicket = countTickets;
+	            } i = 0;
 
-	            // make semi-random choice
-                for (Process process: (*readyQueue)) {
-                    initickets = countTickets;
-                    countTickets += (process.getPriority() + 1) * 10;
-                    for (int j = initickets; j < countTickets; j++){
-                        tickets[j] = i;
-                    } i++;
-                }
+	            // make a random coice for ticket
                 srand((unsigned)time(0));
-                winner = tickets[rand()%(countTickets + 1)];
+                winner = rand()%(countTickets + 1);
+
+	            // get the winner process
+	            for (Process process: (*readyQueue))
+		            if (process.firstTicket <= winner && process.lastTicket >= winner) {
+			            winner = i;
+			            break;
+		            } else i++;
 
 	            // set Quantum as 2
                 (*_quantum) = 2;

@@ -34,6 +34,8 @@ public:
 	void decrementExecutionTime() {if (executionTime > 0) --executionTime;};
 	void decrementBlockTime() {if (blockTime > 0) --blockTime;};
 
+	//only for lottery algorithm (dettermine the range of tickets)
+	uint32_t firstTicket, lastTicket;
 	double executionTime__;
 private:
     int PID, priority;
