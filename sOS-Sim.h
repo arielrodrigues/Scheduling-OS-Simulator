@@ -26,6 +26,7 @@ public:
     std::string getResults();
 	static void DebugLog(std::string happen);
 	static void DebugLog(double instantTime, std::string happen);
+	void Clear(int maxMultiprogramming, bool step_by_step, bool debugmode);
 
 private:
 	bool EmptyQueue();

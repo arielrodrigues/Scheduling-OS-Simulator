@@ -59,7 +59,7 @@ bool Simulator::StartProcess(std::tuple<int, double, int, double, double> _proce
 void Simulator::TerminateProcess(Process _process) {
     _avgWaitingTime += _process.getWaitingTime();
     _avgResponseTime += _process.getResponseTime();
-    _avgServiceTime += _process.executionTime__;
+    _avgServiceTime += (_elapsedTime - _process.getSubmissionTime() - _process.getWaitingTime());
     _avgTurnaroundTime += _process.getTurnaroundTime();
     DebugLog(_elapsedTime, ("Processo " + std::to_string(_process.getPID()) + " finalizado"));
 }
@@ -88,7 +88,7 @@ void Simulator::CheckRunningProcess() {
             runningProcess.erase(runningProcess.begin());
             DebugLog(_elapsedTime, ("Processo " + std::to_string(runningProcess[0].getPID()) + " suspenso"));
         } else if (this->_quantum < 1) { // suspend process
-            readysuspendQueue.push_back(runningProcess[0]);
+            readyQueue.push_back(runningProcess[0]);
             runningProcess.erase(runningProcess.begin());
             DebugLog(_elapsedTime, ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado"));
         }
@@ -151,7 +151,7 @@ void Simulator::StartSimulation(
             CheckQueues();
 
             // Medium-term scheduling
-            while (readyQueue.size() < maxProcessMultiprogramming && readysuspendQueue.size() > 0)
+            while (readyQueue.size() < maxProcessMultiprogramming-runningProcess.size() && readysuspendQueue.size() > 0)
                 Algorithms::FCFS(&readysuspendQueue, &readyQueue, _elapsedTime);
 
             // Short-term scheduling
@@ -174,8 +174,8 @@ void Simulator::StartSimulation(
 void Simulator::CalcStatistics() {
     --_elapsedTime; --_cpuIdleTime;
     DebugLog("\nFim da simulação\n*******************************\nCalculando estatísticas");
-    _processorUse = std::round((static_cast<double>(_elapsedTime) - _cpuIdleTime) / _elapsedTime * 100);
-    _throughput = std::round(static_cast<double>(countProcess) / _elapsedTime * 100);
+    _processorUse = (static_cast<double>(_elapsedTime) - _cpuIdleTime) / _elapsedTime * 100;
+    _throughput = static_cast<double>(countProcess) / _elapsedTime * 100;
     _avgWaitingTime /= countProcess;
     _avgResponseTime /= countProcess;
     _avgTurnaroundTime /= countProcess;
@@ -208,4 +208,33 @@ void Simulator::DebugLog(std::string happen) {
 
 void Simulator::DebugLog(double instantTime, std::string happen) {
     if (Simulator::debugmode) std::cout << "T = " << instantTime << ": " << happen << std::endl;
+}
+
+void Simulator::Clear(int maxMultiprogramming, bool step_by_step, bool debugmode) {
+	this->_cpuIdle = true;
+	this->_quantum = 0;
+	this->debugmode = debugmode;
+	this->SPEED_ = step_by_step? 1/2.0 : 0;
+	this->maxProcessMultiprogramming = maxMultiprogramming;
+
+	this->lastUpdate = 0;
+	this->countProcess = 0;
+	// statistics
+	this->_elapsedTime = 0;
+	this->_processorUse = 0;
+	this->_avgWaitingTime = 0;
+	this->_avgResponseTime = 0;
+	this->_avgTurnaroundTime = 0;
+	this->_avgServiceTime = 0;
+	this->_throughput = 0;
+	this->_cpuIdleTime = 0;
+
+	//queues
+	this->incomingQueue.clear();
+	this->readysuspendQueue.clear();
+	this->readyQueue.clear();
+	this->runningProcess.clear();
+	this->blockedQueue.clear();
+
+	this->out.clear();
 }

@@ -7,7 +7,7 @@
 #include "FileManager.h"
 
 std::vector<std::tuple<int, double, int, double, double>> process;
-bool step_by_step = false, debug_mode = true;
+bool step_by_step = false, debug_mode = false;
 
 /**
  * Reads the file, takes the tuples from the processes and places them in a vector;
@@ -52,40 +52,28 @@ int main() {
 	algorithms.push_back(SD);
 	algorithms.push_back(FEEDBACK);
 
+	Simulator sim(0, step_by_step, debug_mode);
 	std::stringstream out;
-	/*for (uint32_t alfa = 100; alfa < 300; alfa*=2) {
+
+	for (uint32_t alfa = 100; alfa < 300; alfa*=2) {
 		out << "**** ALFA " << alfa << " ****\n";
 		std::cout << "**** ALFA " << alfa << " ****\n";
-		Simulator sim(100, step_by_step, debug_mode);
 		Algorithms::maxProcessMultiprogramming = alfa;
-		for (auto i = 1, j = 0; i < 5; i++, j = 0) {
+		for (auto i = 1, j = 0; i < 6; i++, j = 0) {
 			out << "Cenário " << i << ": \n";
 			std::cout << "Cenário " << i << ": \n";
+			process.clear();
 			filetoVectorofTuples("/home/ariel/ClionProjects/Simple-OS-Simulator/Cenarios/cenario"+std::to_string(i)+".txt");
 			for (auto algorithm: algorithms){
-				out << "Algoritmo: " << j++ << "\n";
-				std::cout << "Algoritmo: " << j++ << "\n";
+				sim.Clear(alfa, step_by_step, debug_mode);
+				out << "Algoritmo: " << ++j << "\n";
+				std::cout << "Algoritmo: " << j << "\n";
 				sim.StartSimulation(algorithm, process);
 				out << sim.getResults() << "\n\n";
-			} process.clear();
+			}
 		}
-	}*/
+	}
 
-	filetoVectorofTuples("/home/ariel/ClionProjects/Simple-OS-Simulator/teste.txt");
-	/*auto i = 0;
-	for (auto algorithm: algorithms) {
-		Simulator sim(100, step_by_step, debug_mode);
-		std::cout << "\n\nAlgoritmo: " << i++ << "\n";
-		sim.StartSimulation(algorithm, process);
-		out << "Algoritmo: " << i++ << "\n";
-		out << sim.getResults() << "\n\n";
-	} process.clear();*/
-
-	Simulator sim(100, step_by_step, debug_mode);
-	sim.StartSimulation(HRRN, process);
-	out << "Algoritmo: " << "HRRN" << "\n";
-	out << sim.getResults() << "\n\n";
-
-	FileManager::writeFile("/home/ariel/ClionProjects/Simple-OS-Simulator/simulationteste.out", out.str());
+	FileManager::writeFile("/home/ariel/ClionProjects/Simple-OS-Simulator/simulation.out", out.str());
 	return 0;
 }
