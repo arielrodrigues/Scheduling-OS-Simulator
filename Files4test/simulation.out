@@ -1,0 +1,616 @@
+**** ALFA 100 ****
+Cenário 1: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 282277
+Utilização do processador (CPU efficiency): 99.9922%
+Vazão (Throughput): 0.354262%
+Tempo médio de espera (Average waiting time): 144995
+Tempo médio de resposta (Average response time): 118294
+Tempo médio de retorno (Average turnaround time): 145277
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 282265
+Utilização do processador (CPU efficiency): 99.9965%
+Vazão (Throughput): 0.354277%
+Tempo médio de espera (Average waiting time): 106562
+Tempo médio de resposta (Average response time): 106281
+Tempo médio de retorno (Average turnaround time): 106844
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 282843
+Utilização do processador (CPU efficiency): 99.7921%
+Vazão (Throughput): 0.353553%
+Tempo médio de espera (Average waiting time): 142010
+Tempo médio de resposta (Average response time): 141729
+Tempo médio de retorno (Average turnaround time): 142292
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 282375
+Utilização do processador (CPU efficiency): 99.9575%
+Vazão (Throughput): 0.354139%
+Tempo médio de espera (Average waiting time): 144943
+Tempo médio de resposta (Average response time): 118632
+Tempo médio de retorno (Average turnaround time): 145225
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 282279
+Utilização do processador (CPU efficiency): 99.9915%
+Vazão (Throughput): 0.354259%
+Tempo médio de espera (Average waiting time): 145018
+Tempo médio de resposta (Average response time): 118035
+Tempo médio de retorno (Average turnaround time): 145300
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 282296
+Utilização do processador (CPU efficiency): 99.9855%
+Vazão (Throughput): 0.354238%
+Tempo médio de espera (Average waiting time): 139365
+Tempo médio de resposta (Average response time): 135302
+Tempo médio de retorno (Average turnaround time): 139647
+Tempo médio de serviço (Average service time): 282.255
+
+
+Cenário 2: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 1372001
+Utilização do processador (CPU efficiency): 99.9907%
+Vazão (Throughput): 0.364431%
+Tempo médio de espera (Average waiting time): 691921
+Tempo médio de resposta (Average response time): 665099
+Tempo médio de retorno (Average turnaround time): 692196
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 1371885
+Utilização do processador (CPU efficiency): 99.9992%
+Vazão (Throughput): 0.364462%
+Tempo médio de espera (Average waiting time): 633383
+Tempo médio de resposta (Average response time): 633114
+Tempo médio de retorno (Average turnaround time): 633658
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 1372305
+Utilização do processador (CPU efficiency): 99.9686%
+Vazão (Throughput): 0.36435%
+Tempo médio de espera (Average waiting time): 685535
+Tempo médio de resposta (Average response time): 685265
+Tempo médio de retorno (Average turnaround time): 685809
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 1372253
+Utilização do processador (CPU efficiency): 99.9724%
+Vazão (Throughput): 0.364364%
+Tempo médio de espera (Average waiting time): 691577
+Tempo médio de resposta (Average response time): 664913
+Tempo médio de retorno (Average turnaround time): 691852
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 1372004
+Utilização do processador (CPU efficiency): 99.9905%
+Vazão (Throughput): 0.36443%
+Tempo médio de espera (Average waiting time): 691943
+Tempo médio de resposta (Average response time): 664829
+Tempo médio de retorno (Average turnaround time): 692218
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 1372129
+Utilização do processador (CPU efficiency): 99.9814%
+Vazão (Throughput): 0.364397%
+Tempo médio de espera (Average waiting time): 690094
+Tempo médio de resposta (Average response time): 671692
+Tempo médio de retorno (Average turnaround time): 690369
+Tempo médio de serviço (Average service time): 274.375
+
+
+Cenário 3: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 2724185
+Utilização do processador (CPU efficiency): 99.9929%
+Vazão (Throughput): 0.367082%
+Tempo médio de espera (Average waiting time): 1.36534e+06
+Tempo médio de resposta (Average response time): 1.33861e+06
+Tempo médio de retorno (Average turnaround time): 1.36561e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 2723998
+Utilização do processador (CPU efficiency): 99.9997%
+Vazão (Throughput): 0.367107%
+Tempo médio de espera (Average waiting time): 1.30073e+06
+Tempo médio de resposta (Average response time): 1.30046e+06
+Tempo médio de retorno (Average turnaround time): 1.301e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 2724185
+Utilização do processador (CPU efficiency): 99.9929%
+Vazão (Throughput): 0.367082%
+Tempo médio de espera (Average waiting time): 1.36205e+06
+Tempo médio de resposta (Average response time): 1.36178e+06
+Tempo médio de retorno (Average turnaround time): 1.36232e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 2724210
+Utilização do processador (CPU efficiency): 99.992%
+Vazão (Throughput): 0.367079%
+Tempo médio de espera (Average waiting time): 1.36521e+06
+Tempo médio de resposta (Average response time): 1.33831e+06
+Tempo médio de retorno (Average turnaround time): 1.36548e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 2724185
+Utilização do processador (CPU efficiency): 99.9929%
+Vazão (Throughput): 0.367082%
+Tempo médio de espera (Average waiting time): 1.36536e+06
+Tempo médio de resposta (Average response time): 1.33834e+06
+Tempo médio de retorno (Average turnaround time): 1.36563e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 2724006
+Utilização do processador (CPU efficiency): 99.9994%
+Vazão (Throughput): 0.367106%
+Tempo médio de espera (Average waiting time): 1.36387e+06
+Tempo médio de resposta (Average response time): 1.34082e+06
+Tempo médio de retorno (Average turnaround time): 1.36414e+06
+Tempo médio de serviço (Average service time): 272.399
+
+
+Cenário 4: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.74839e+06
+Tempo médio de resposta (Average response time): 2.72134e+06
+Tempo médio de retorno (Average turnaround time): 2.74866e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.68054e+06
+Tempo médio de resposta (Average response time): 2.68027e+06
+Tempo médio de retorno (Average turnaround time): 2.68082e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 5499529
+Utilização do processador (CPU efficiency): 99.9966%
+Vazão (Throughput): 0.363668%
+Tempo médio de espera (Average waiting time): 2.74416e+06
+Tempo médio de resposta (Average response time): 2.74388e+06
+Tempo médio de retorno (Average turnaround time): 2.74443e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 5499748
+Utilização do processador (CPU efficiency): 99.9926%
+Vazão (Throughput): 0.363653%
+Tempo médio de espera (Average waiting time): 2.74845e+06
+Tempo médio de resposta (Average response time): 2.72121e+06
+Tempo médio de retorno (Average turnaround time): 2.74872e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.74841e+06
+Tempo médio de resposta (Average response time): 2.72107e+06
+Tempo médio de retorno (Average turnaround time): 2.74868e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 5499519
+Utilização do processador (CPU efficiency): 99.9968%
+Vazão (Throughput): 0.363668%
+Tempo médio de espera (Average waiting time): 2.74688e+06
+Tempo médio de resposta (Average response time): 2.72129e+06
+Tempo médio de retorno (Average turnaround time): 2.74716e+06
+Tempo médio de serviço (Average service time): 274.967
+
+
+Cenário 5: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 13767648
+Utilização do processador (CPU efficiency): 99.9997%
+Vazão (Throughput): 0.36317%
+Tempo médio de espera (Average waiting time): 6.86118e+06
+Tempo médio de resposta (Average response time): 6.83406e+06
+Tempo médio de retorno (Average turnaround time): 6.86145e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 13767607
+Utilização do processador (CPU efficiency): 100%
+Vazão (Throughput): 0.363171%
+Tempo médio de espera (Average waiting time): 6.78839e+06
+Tempo médio de resposta (Average response time): 6.78811e+06
+Tempo médio de retorno (Average turnaround time): 6.78866e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 13768078
+Utilização do processador (CPU efficiency): 99.9966%
+Vazão (Throughput): 0.363159%
+Tempo médio de espera (Average waiting time): 6.85669e+06
+Tempo médio de resposta (Average response time): 6.85641e+06
+Tempo médio de retorno (Average turnaround time): 6.85696e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 13767961
+Utilização do processador (CPU efficiency): 99.9974%
+Vazão (Throughput): 0.363162%
+Tempo médio de espera (Average waiting time): 6.86122e+06
+Tempo médio de resposta (Average response time): 6.83393e+06
+Tempo médio de retorno (Average turnaround time): 6.8615e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 13767704
+Utilização do processador (CPU efficiency): 99.9993%
+Vazão (Throughput): 0.363169%
+Tempo médio de espera (Average waiting time): 6.8612e+06
+Tempo médio de resposta (Average response time): 6.83379e+06
+Tempo médio de retorno (Average turnaround time): 6.86147e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 13767645
+Utilização do processador (CPU efficiency): 99.9997%
+Vazão (Throughput): 0.36317%
+Tempo médio de espera (Average waiting time): 6.86052e+06
+Tempo médio de resposta (Average response time): 6.83392e+06
+Tempo médio de retorno (Average turnaround time): 6.86079e+06
+Tempo médio de serviço (Average service time): 275.352
+
+**** ALFA 200 ****
+Cenário 1: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 282277
+Utilização do processador (CPU efficiency): 99.9922%
+Vazão (Throughput): 0.354262%
+Tempo médio de espera (Average waiting time): 148708
+Tempo médio de resposta (Average response time): 97700.6
+Tempo médio de retorno (Average turnaround time): 148990
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 282265
+Utilização do processador (CPU efficiency): 99.9965%
+Vazão (Throughput): 0.354277%
+Tempo médio de espera (Average waiting time): 92061.2
+Tempo médio de resposta (Average response time): 91780.4
+Tempo médio de retorno (Average turnaround time): 92343.4
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 282843
+Utilização do processador (CPU efficiency): 99.7921%
+Vazão (Throughput): 0.353553%
+Tempo médio de espera (Average waiting time): 141039
+Tempo médio de resposta (Average response time): 140758
+Tempo médio de retorno (Average turnaround time): 141321
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 282938
+Utilização do processador (CPU efficiency): 99.7586%
+Vazão (Throughput): 0.353434%
+Tempo médio de espera (Average waiting time): 148743
+Tempo médio de resposta (Average response time): 97665.7
+Tempo médio de retorno (Average turnaround time): 149025
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 282277
+Utilização do processador (CPU efficiency): 99.9922%
+Vazão (Throughput): 0.354262%
+Tempo médio de espera (Average waiting time): 148744
+Tempo médio de resposta (Average response time): 97196.9
+Tempo médio de retorno (Average turnaround time): 149026
+Tempo médio de serviço (Average service time): 282.255
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 282296
+Utilização do processador (CPU efficiency): 99.9855%
+Vazão (Throughput): 0.354238%
+Tempo médio de espera (Average waiting time): 138867
+Tempo médio de resposta (Average response time): 133203
+Tempo médio de retorno (Average turnaround time): 139149
+Tempo médio de serviço (Average service time): 282.255
+
+Cenário 2: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 1371876
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.364464%
+Tempo médio de espera (Average waiting time): 695623
+Tempo médio de resposta (Average response time): 642391
+Tempo médio de retorno (Average turnaround time): 695897
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 1371885
+Utilização do processador (CPU efficiency): 99.9992%
+Vazão (Throughput): 0.364462%
+Tempo médio de espera (Average waiting time): 592694
+Tempo médio de resposta (Average response time): 592424
+Tempo médio de retorno (Average turnaround time): 592968
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 1372305
+Utilização do processador (CPU efficiency): 99.9686%
+Vazão (Throughput): 0.36435%
+Tempo médio de espera (Average waiting time): 684102
+Tempo médio de resposta (Average response time): 683832
+Tempo médio de retorno (Average turnaround time): 684376
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 1372095
+Utilização do processador (CPU efficiency): 99.9839%
+Vazão (Throughput): 0.364406%
+Tempo médio de espera (Average waiting time): 695400
+Tempo médio de resposta (Average response time): 642136
+Tempo médio de retorno (Average turnaround time): 695674
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 1371875
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.364465%
+Tempo médio de espera (Average waiting time): 695652
+Tempo médio de resposta (Average response time): 641839
+Tempo médio de retorno (Average turnaround time): 695926
+Tempo médio de serviço (Average service time): 274.375
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 1371988
+Utilização do processador (CPU efficiency): 99.9917%
+Vazão (Throughput): 0.364435%
+Tempo médio de espera (Average waiting time): 691679
+Tempo médio de resposta (Average response time): 673474
+Tempo médio de retorno (Average turnaround time): 691953
+Tempo médio de serviço (Average service time): 274.375
+
+Cenário 3: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 2724165
+Utilização do processador (CPU efficiency): 99.9936%
+Vazão (Throughput): 0.367085%
+Tempo médio de espera (Average waiting time): 1.36908e+06
+Tempo médio de resposta (Average response time): 1.31586e+06
+Tempo médio de retorno (Average turnaround time): 1.36935e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 2723998
+Utilização do processador (CPU efficiency): 99.9997%
+Vazão (Throughput): 0.367107%
+Tempo médio de espera (Average waiting time): 1.25125e+06
+Tempo médio de resposta (Average response time): 1.25097e+06
+Tempo médio de retorno (Average turnaround time): 1.25152e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 2724185
+Utilização do processador (CPU efficiency): 99.9929%
+Vazão (Throughput): 0.367082%
+Tempo médio de espera (Average waiting time): 1.36181e+06
+Tempo médio de resposta (Average response time): 1.36154e+06
+Tempo médio de retorno (Average turnaround time): 1.36208e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 2724297
+Utilização do processador (CPU efficiency): 99.9888%
+Vazão (Throughput): 0.367067%
+Tempo médio de espera (Average waiting time): 1.36971e+06
+Tempo médio de resposta (Average response time): 1.31621e+06
+Tempo médio de retorno (Average turnaround time): 1.36998e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 2724185
+Utilização do processador (CPU efficiency): 99.9929%
+Vazão (Throughput): 0.367082%
+Tempo médio de espera (Average waiting time): 1.36912e+06
+Tempo médio de resposta (Average response time): 1.31531e+06
+Tempo médio de retorno (Average turnaround time): 1.36939e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 2724026
+Utilização do processador (CPU efficiency): 99.9987%
+Vazão (Throughput): 0.367104%
+Tempo médio de espera (Average waiting time): 1.36426e+06
+Tempo médio de resposta (Average response time): 1.32667e+06
+Tempo médio de retorno (Average turnaround time): 1.36453e+06
+Tempo médio de serviço (Average service time): 272.399
+
+Cenário 4: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.75252e+06
+Tempo médio de resposta (Average response time): 2.69854e+06
+Tempo médio de retorno (Average turnaround time): 2.75279e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.62572e+06
+Tempo médio de resposta (Average response time): 2.62545e+06
+Tempo médio de retorno (Average turnaround time): 2.62599e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 5499529
+Utilização do processador (CPU efficiency): 99.9966%
+Vazão (Throughput): 0.363668%
+Tempo médio de espera (Average waiting time): 2.74416e+06
+Tempo médio de resposta (Average response time): 2.74389e+06
+Tempo médio de retorno (Average turnaround time): 2.74443e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 5499580
+Utilização do processador (CPU efficiency): 99.9957%
+Vazão (Throughput): 0.363664%
+Tempo médio de espera (Average waiting time): 2.7525e+06
+Tempo médio de resposta (Average response time): 2.69824e+06
+Tempo médio de retorno (Average turnaround time): 2.75278e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 5499348
+Utilização do processador (CPU efficiency): 99.9999%
+Vazão (Throughput): 0.363679%
+Tempo médio de espera (Average waiting time): 2.75256e+06
+Tempo médio de resposta (Average response time): 2.69799e+06
+Tempo médio de retorno (Average turnaround time): 2.75283e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 5499447
+Utilização do processador (CPU efficiency): 99.9981%
+Vazão (Throughput): 0.363673%
+Tempo médio de espera (Average waiting time): 2.7487e+06
+Tempo médio de resposta (Average response time): 2.70111e+06
+Tempo médio de retorno (Average turnaround time): 2.74898e+06
+Tempo médio de serviço (Average service time): 274.967
+
+Cenário 5: 
+Algoritmo: 1
+*******************************
+Duração da Simulação (Simulation duration): 13767727
+Utilização do processador (CPU efficiency): 99.9991%
+Vazão (Throughput): 0.363168%
+Tempo médio de espera (Average waiting time): 6.86524e+06
+Tempo médio de resposta (Average response time): 6.81105e+06
+Tempo médio de retorno (Average turnaround time): 6.86552e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 2
+*******************************
+Duração da Simulação (Simulation duration): 13767607
+Utilização do processador (CPU efficiency): 100%
+Vazão (Throughput): 0.363171%
+Tempo médio de espera (Average waiting time): 6.72508e+06
+Tempo médio de resposta (Average response time): 6.7248e+06
+Tempo médio de retorno (Average turnaround time): 6.72535e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 3
+*******************************
+Duração da Simulação (Simulation duration): 13768078
+Utilização do processador (CPU efficiency): 99.9966%
+Vazão (Throughput): 0.363159%
+Tempo médio de espera (Average waiting time): 6.85625e+06
+Tempo médio de resposta (Average response time): 6.85598e+06
+Tempo médio de retorno (Average turnaround time): 6.85653e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 4
+*******************************
+Duração da Simulação (Simulation duration): 13767915
+Utilização do processador (CPU efficiency): 99.9978%
+Vazão (Throughput): 0.363163%
+Tempo médio de espera (Average waiting time): 6.86534e+06
+Tempo médio de resposta (Average response time): 6.81082e+06
+Tempo médio de retorno (Average turnaround time): 6.86562e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 5
+*******************************
+Duração da Simulação (Simulation duration): 13767667
+Utilização do processador (CPU efficiency): 99.9996%
+Vazão (Throughput): 0.36317%
+Tempo médio de espera (Average waiting time): 6.86529e+06
+Tempo médio de resposta (Average response time): 6.81051e+06
+Tempo médio de retorno (Average turnaround time): 6.86556e+06
+Tempo médio de serviço (Average service time): 275.352
+
+Algoritmo: 6
+*******************************
+Duração da Simulação (Simulation duration): 13767645
+Utilização do processador (CPU efficiency): 99.9997%
+Vazão (Throughput): 0.36317%
+Tempo médio de espera (Average waiting time): 6.86353e+06
+Tempo médio de resposta (Average response time): 6.81216e+06
+Tempo médio de retorno (Average turnaround time): 6.86381e+06
+Tempo médio de serviço (Average service time): 275.352
+
