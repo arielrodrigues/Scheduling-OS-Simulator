@@ -63,8 +63,8 @@ int main() {
 			out << "Cenário " << i << ": \n";
 			std::cout << "Cenário " << i << ": \n";
 			process.clear();
-			filetoVectorofTuples("/home/ariel/ClionProjects/Simple-OS-Simulator/Cenarios/cenario"+std::to_string(i)+".txt");
-			for (auto algorithm: algorithms){
+			filetoVectorofTuples("/home/ariel/ClionProjects/sOS-Sim/Files4test/cenario"+std::to_string(i)+".txt");
+			for (auto algorithm: algorithms) {
 				sim.Clear(alfa, step_by_step, debug_mode);
 				out << "Algoritmo: " << ++j << "\n";
 				std::cout << "Algoritmo: " << j << "\n";
@@ -74,6 +74,6 @@ int main() {
 		}
 	}
 
-	FileManager::writeFile("/home/ariel/ClionProjects/Simple-OS-Simulator/simulation.out", out.str());
+	FileManager::writeFile("/home/ariel/ClionProjects/sOS-Sim/simulation.out", out.str());
 	return 0;
 }

@@ -63,6 +63,11 @@ double Process::getTurnaroundTime() {
 	return turnaroundTime;
 }
 
+void Process::updateSubmissionTime(double _submissionTime) {
+    this->submissionTime =  _submissionTime;
+}
+
+
 void Process::setResponseTime(double _elapsedTime) {
     this->responseTime = _elapsedTime - this->submissionTime;
 }

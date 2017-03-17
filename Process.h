@@ -29,6 +29,7 @@ public:
     double getResponseTime();
     double getWaitingTime();
 	double getTurnaroundTime();
+	void updateSubmissionTime(double _submissionTime);
     void setResponseTime(double _elapsedTime);
     void setWaitingTime(double _elapsedTime);
 	void setTurnaroundTime(double _elapsedTime);

@@ -25,7 +25,8 @@ namespace Algorithms {
                 Simulator::DebugLog(_elapsedTime,
                                     "Processo " + std::to_string((*readysuspendedQueue)[0].getPID()) + " pronto");
 
-	            readyQueue->push_back((*readysuspendedQueue)[0]);
+                (*readysuspendedQueue)[0].updateSubmissionTime(_elapsedTime);
+                readyQueue->push_back((*readysuspendedQueue)[0]);
                 readysuspendedQueue->erase(readysuspendedQueue->begin());
                 return true;
             } else return false;
