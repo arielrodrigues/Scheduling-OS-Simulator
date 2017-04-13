@@ -7,7 +7,7 @@ set(SOURCE_FILES
         main.cpp
         Process.cpp
         sOS-Sim.cpp
-        Algorithms.h
+        ProcessSchedulingAlgorithms.h
         FileManager.h
-        )
+        PageReplacementAlgorithms.h Page.h)
 add_executable(Simple_OS_Simulator ${SOURCE_FILES})
