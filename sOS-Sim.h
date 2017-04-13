@@ -7,11 +7,11 @@
 #include <vector>
 #include <iomanip>
 #include "Process.h"
+#include "Page.h"
 
 #ifndef SIMPLE_OS_SIMULATOR_SIMULATOR_H
 #define SIMPLE_OS_SIMULATOR_SIMULATOR_H
 
-#define noRemainingTime(_process) _process.getExecutionTime() < 1 && _process.getBlockTime() < 1
 #define remainingSubmissionTime(_process) _process.getSubmissionTime() - _elapsedTime
 #define decrementQuantum() _quantum--
 #define noProcessRunning() runningProcess.size() < 1
@@ -22,32 +22,50 @@ class Simulator {
 public:
 	Simulator(int, bool, bool);
     void StartSimulation(bool (*shortTermSchedulingAlgorithm)(std::vector <Process>*, std::vector<Process>*, int*, double),
-						 std::vector<std::tuple<int, double, int, double, double>>);
+						 bool (*pageReplacementAlgorithm)(std::vector<Page>*, std::vector<Page>*, Page, double),
+						 std::vector<std::tuple<int, double, int, double, double, std::vector<Page>>>);
     std::string getResults();
 	static void DebugLog(std::string happen);
 	static void DebugLog(double instantTime, std::string happen);
 	void Clear(int maxMultiprogramming, bool step_by_step, bool debugmode);
 
+	static const int numberOfMemoryFrames = 3;
+
 private:
+    bool isSysFull();
 	bool EmptyQueue();
 	void TerminateProcess(Process);
-	bool StartProcess(std::tuple<int, double, int, double, double>);
+	bool StartProcess(std::tuple<int, double, int, double, double,std::vector<Page>>);
 	void CheckRunningProcess();
 	void CheckBlockedQueue();
 	void CheckIncomingQueue();
+    void CheckReadySuspensedQueue();
 	void CheckQueues();
 	void CalcStatistics();
+	bool PageInMemory();
+    void RemovePages(uint32_t PID);
 
 	static bool debugmode;
 	static int _quantum;
 	bool _cpuIdle;
     int _elapsedTime, _cpuIdleTime, maxProcessMultiprogramming, countProcess;
     // Scheduling process' queues
-    std::vector<Process> incomingQueue, readysuspendQueue, readyQueue, runningProcess, blockedQueue;
+    std::vector<Process> incomingQueue, waitingQueue, readySuspensedQueue, readyQueue,
+                         runningProcess, blockedQueue, blockedSuspensedQueue;
+    // Memory frames and disk
+    std::vector<Page> Disk, memoryFrames;
 	// Statistics
 	double _processorUse, _throughput, _avgWaitingTime, lastUpdate, SPEED_,
 		  _avgResponseTime, _avgTurnaroundTime, _avgServiceTime;
 	std::stringstream out;
+
+	struct Statistics {
+		uint32_t hits;
+		uint32_t miss;
+        double hitRate;
+	};
+
+    Statistics _pageStatistics;
 };
 
 

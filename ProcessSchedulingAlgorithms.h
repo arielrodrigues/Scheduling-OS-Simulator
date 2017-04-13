@@ -10,24 +10,24 @@
 #include "Process.h"
 #include "sOS-Sim.h"
 
-namespace Algorithms {
+namespace ProcessSchedulingAlgorithms {
 
 	static uint32_t maxProcessMultiprogramming = 0;
 
 	/***
 	 * First-Come-First-Served (FCFS) scheduling algorithm [also know as First-In-Fist-Out (FIFO)]
 	 * Used to medium-term Scheduling
-	 * @return (*readysuspendedQueue)[0]
+	 * @return (*waitingQueue)[0]
 	 */
-    static bool FCFS(std::vector<Process>* readysuspendedQueue, std::vector<Process>* readyQueue, double _elapsedTime) {
+    static bool FCFS(std::vector<Process>* waitingQueue, std::vector<Process>* readyQueue, double _elapsedTime) {
         try {
-            if (!readysuspendedQueue->empty()) {
+            if (!waitingQueue->empty()) {
                 Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readysuspendedQueue)[0].getPID()) + " pronto");
+                                    "Processo " + std::to_string((*waitingQueue)[0].getPID()) + " pronto");
 
-                (*readysuspendedQueue)[0].updateSubmissionTime(_elapsedTime);
-                readyQueue->push_back((*readysuspendedQueue)[0]);
-                readysuspendedQueue->erase(readysuspendedQueue->begin());
+                (*waitingQueue)[0].updateSubmissionTime(_elapsedTime);
+                readyQueue->push_back((*waitingQueue)[0]);
+                waitingQueue->erase(waitingQueue->begin());
                 return true;
             } else return false;
         }
@@ -169,7 +169,7 @@ namespace Algorithms {
             if (!readyQueue->empty()) {
 
 	            // set Quantum as 4
-	            (*_quantum) = 4;
+	            (*_quantum) = 2;
 				// set response time
 	            if (firstTimeRunning((*readyQueue)[0])) (*readyQueue)[0].setResponseTime(_elapsedTime);
 

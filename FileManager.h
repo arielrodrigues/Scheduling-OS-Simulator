@@ -15,6 +15,7 @@ namespace FileManager {
      */
     static std::stringstream readFile(std::string filepath) {
         try {
+            numberofLines = 0;
             std::stringstream out;
             std::ifstream infile(filepath);
             for (std::string line; getline(infile, line);

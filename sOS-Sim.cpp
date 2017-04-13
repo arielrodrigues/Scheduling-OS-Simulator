@@ -1,6 +1,6 @@
 #include <cmath>
 #include "sOS-Sim.h"
-#include "Algorithms.h"
+#include "ProcessSchedulingAlgorithms.h"
 
 bool Simulator::debugmode;
 int Simulator::_quantum;
@@ -21,7 +21,8 @@ Simulator::Simulator(int maxMultiprogramming, bool step_by_step, bool debugmode)
 
     this->lastUpdate = 0;
     this->countProcess = 0;
-    // statistics
+
+    // _pageStatistics
     this->_elapsedTime = 0;
     this->_processorUse = 0;
     this->_avgWaitingTime = 0;
@@ -30,6 +31,17 @@ Simulator::Simulator(int maxMultiprogramming, bool step_by_step, bool debugmode)
     this->_avgServiceTime = 0;
     this->_throughput = 0;
     this->_cpuIdleTime = 0;
+    // from pages
+    this->_pageStatistics.hits = 0;
+    this->_pageStatistics.miss = 0;
+}
+
+/**
+ * @return the sys is full? return true if the number of active process is equal the mutliprogramming level
+ */
+bool Simulator::isSysFull() {
+    return (maxProcessMultiprogramming -
+            (this->runningProcess.size() + this->readyQueue.size() + this->blockedQueue.size())) <= 0;
 }
 
 /**
@@ -39,11 +51,13 @@ Simulator::Simulator(int maxMultiprogramming, bool step_by_step, bool debugmode)
  * @param _process
  * @return success
  */
-bool Simulator::StartProcess(std::tuple<int, double, int, double, double> _process) {
+bool Simulator::StartProcess(std::tuple<int, double, int, double, double, std::vector<Page>> _process) {
     try {
         Process process(_process);
-        if (process.getSubmissionTime() == 0)
-            readyQueue.size() >= 100 ? readysuspendQueue.push_back(process) : readyQueue.push_back(process);
+        if (process.getSubmissionTime() == 0) {
+            !isSysFull()? readyQueue.push_back(process) : waitingQueue.push_back(process);
+            for (Page page : process.getAllPages()) Disk.push_back(page);
+        }
         else incomingQueue.push_back(process);
         countProcess++;
         return true;
@@ -69,8 +83,9 @@ void Simulator::TerminateProcess(Process _process) {
  */
 void Simulator::CheckIncomingQueue() {
     for (auto i = incomingQueue.size(); i-- > 0;) {
-        if (remainingSubmissionTime(incomingQueue[i]) <= 0) { // move to readyQueue
-            readysuspendQueue.push_back(incomingQueue[i]);
+        if (remainingSubmissionTime(incomingQueue[i]) <= 0) { // move to waitingQueue
+            waitingQueue.push_back(incomingQueue[i]);
+            for (Page page : incomingQueue[i].getAllPages()) Disk.push_back(page);
             incomingQueue.erase(incomingQueue.begin() + i);
             DebugLog(_elapsedTime, "Processo " + std::to_string(incomingQueue[i].getPID()) + " submetido");
         }
@@ -78,41 +93,108 @@ void Simulator::CheckIncomingQueue() {
 }
 
 /***
+ * Check if the page that process need to execute righ now is in memory
+ * @return page is in memory?
+ */
+
+bool Simulator::PageInMemory() {
+    if (runningProcess[0].getPage().getLifeTime() == 0) return true; // if is an empty page, process not need a page in memory now
+    for (int i = 0; i < memoryFrames.size(); i++)
+        if (memoryFrames[i].getValue() == runningProcess[0].getPage().getValue()
+            && memoryFrames[i].getPID() == runningProcess[0].getPage().getPID()) {
+            memoryFrames[i].setUsed(_elapsedTime);
+            _pageStatistics.hits++;
+            return true;
+        }
+    _pageStatistics.miss++;
+    return false;
+}
+
+
+/***
+ * Remove all pages linked w/ the process with pid = PID from memory
+ */
+void Simulator::RemovePages(uint32_t PID) {
+    for (int i = 0; i < memoryFrames.size(); i++)
+        if (memoryFrames[i].getPID() == PID) memoryFrames.erase(memoryFrames.begin()+i);
+}
+
+
+/***
  * Check if the process running has quantum time and if it has remaing time to execute, else send to block process
  */
 void Simulator::CheckRunningProcess() {
-    if (runningProcess.size() >= 1) {
+    if (!runningProcess.empty()) {
         runningProcess[0].decrementExecutionTime();
-        if (runningProcess[0].getExecutionTime() < 1) { // block process
-            blockedQueue.push_back(runningProcess[0]);
-            runningProcess.erase(runningProcess.begin());
-            DebugLog(_elapsedTime, ("Processo " + std::to_string(runningProcess[0].getPID()) + " suspenso"));
-        } else if (this->_quantum < 1) { // suspend process
+        runningProcess[0].decrementPageLifeTime();
+        if (runningProcess[0].getExecutionTime() < 1) {
+            if (runningProcess[0].getBlockTime() > 0) { // block process
+                if (!waitingQueue.empty()) { // if are process waiting, block and suspense process
+                    blockedSuspensedQueue.push_back(runningProcess[0]);
+                    RemovePages(runningProcess[0].getPID());
+                    DebugLog(_elapsedTime,
+                             ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado e suspenso"));
+                } else { // just block processs
+                    blockedQueue.push_back(runningProcess[0]);
+                    DebugLog(_elapsedTime,
+                             ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado e pronto"));
+                }
+                runningProcess.erase(runningProcess.begin());
+            } else { // terminate process
+                runningProcess[0].setTurnaroundTime(_elapsedTime);
+                runningProcess[0].setWaitingTime(_elapsedTime);
+                TerminateProcess(runningProcess[0]);
+                runningProcess.erase(runningProcess.begin());
+            }
+        } else if (this->_quantum < 1) { // send process back to ready queue
             readyQueue.push_back(runningProcess[0]);
+            DebugLog(_elapsedTime,
+                     ("Processo " + std::to_string(runningProcess[0].getPID()) + " pronto"));
             runningProcess.erase(runningProcess.begin());
-            DebugLog(_elapsedTime, ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado"));
         }
     }
 }
 
+
 /***
- * Check process in blockedqueue and terminate it (if blockedtime <= 0)
+ * Check process in blockedqueue and blockedSuspensedQueue and decrement block time from this process if blocktime
+ * from a process is over, then send it back to readyqueue. If has process waiting, it has priority to come to readyQueue
+ * The process will be finnished when it come back to runningProcess
  */
 void Simulator::CheckBlockedQueue() {
-    for (auto i = blockedQueue.size(); i-- > 0;) {
-        blockedQueue[i].decrementBlockTime();
-        if (noRemainingTime(blockedQueue[i])) { // terminate process
-            blockedQueue[i].setTurnaroundTime(_elapsedTime);
-            blockedQueue[i].setWaitingTime(_elapsedTime);
-            TerminateProcess(blockedQueue[i]);
+    for (auto i = blockedQueue.size(); i-- > 0; ) { // checks blocked queue
+        if (blockedQueue[i].getBlockTime() > 0) blockedQueue[i].decrementBlockTime();
+        if (blockedQueue[i].getBlockTime() <= 0 && waitingQueue.empty()) { // if no block time remains and waiting queue is empty, send it to ready queue
+            readyQueue.push_back(blockedQueue[i]);
             blockedQueue.erase(blockedQueue.begin() + i);
         }
     }
+    for (auto i = blockedSuspensedQueue.size(); i-- > 0; ) { // checks blocked suspensed queue
+        if (blockedSuspensedQueue[i].getBlockTime() > 0) blockedSuspensedQueue[i].decrementBlockTime();
+        if (blockedSuspensedQueue[i].getBlockTime() <= 0) {// if no block time remains, send it to ready suspensed queue
+            readySuspensedQueue.push_back(blockedSuspensedQueue[i]);
+            blockedSuspensedQueue.erase(blockedSuspensedQueue.begin() + i);
+        }
+    }
 }
 
+
+/***
+ * Check each suspensed process and, if has space on memory, put it in non active (non suspensed) mode
+ */
+void Simulator::CheckReadySuspensedQueue() {
+    if (waitingQueue.empty() && !readySuspensedQueue.empty() && !isSysFull()) // if has no process waiting to born
+        ProcessSchedulingAlgorithms::FCFS(&readySuspensedQueue, &readyQueue, _elapsedTime);
+}
+
+
+/***
+ * Call function to check all queues
+ */
 void Simulator::CheckQueues() {
     CheckIncomingQueue();
     CheckBlockedQueue();
+    CheckReadySuspensedQueue();
     CheckRunningProcess();
 }
 
@@ -122,9 +204,10 @@ void Simulator::CheckQueues() {
  * @return incomingqueue and readyqueue and blockedqueue are empty?
  */
 bool Simulator::EmptyQueue() {
-    return incomingQueue.empty() && readysuspendQueue.empty()
-           && readyQueue.empty() && blockedQueue.empty() && _cpuIdle;
+    return incomingQueue.empty() && waitingQueue.empty() &&readySuspensedQueue.empty()
+           && readyQueue.empty() && blockedQueue.empty() &&blockedSuspensedQueue.empty() && _cpuIdle;
 }
+
 
 /***
  * Start the simulation using the algorithm parameter-passed to schedule process
@@ -134,12 +217,13 @@ bool Simulator::EmptyQueue() {
  */
 void Simulator::StartSimulation(
         bool (*shortTermSchedulingAlgorithm)(std::vector<Process>*, std::vector<Process>*, int*, double),
-        std::vector<std::tuple<int, double, int, double, double>> process) {
+        bool (*pageReplacementAlgorithm)(std::vector<Page>*, std::vector<Page>*, Page, double),
+        std::vector<std::tuple<int, double, int, double, double,std::vector<Page>>> process) {
 
     DebugLog("Inicio da simulação:");
 
     // For each process, create and put it on a queue
-    for (std::tuple<int, double, int, double, double> _process : process)
+    for (std::tuple<int, double, int, double, double, std::vector<Page>> _process : process)
         StartProcess(_process);
 
     // Clear vector of tuples
@@ -151,12 +235,20 @@ void Simulator::StartSimulation(
             CheckQueues();
 
             // Medium-term scheduling
-            while (readyQueue.size() < maxProcessMultiprogramming-runningProcess.size() && readysuspendQueue.size() > 0)
-                Algorithms::FCFS(&readysuspendQueue, &readyQueue, _elapsedTime);
+            while (!isSysFull()) {
+                if (!waitingQueue.empty()) {
+                    if (ProcessSchedulingAlgorithms::FCFS(&waitingQueue, &readyQueue, _elapsedTime))
+                        pageReplacementAlgorithm(&memoryFrames, &Disk, readyQueue.back().getPage(), _elapsedTime);
+                } else break;
+            }
 
             // Short-term scheduling
             if (noProcessRunning())
                 _cpuIdle = !shortTermSchedulingAlgorithm(&readyQueue, &runningProcess, &_quantum, _elapsedTime);
+
+            // Check if page of running process is in memory
+            if (!_cpuIdle && !PageInMemory())
+                pageReplacementAlgorithm(&memoryFrames, &Disk, runningProcess[0].getPage(), _elapsedTime);
 
             // Update counters
             _elapsedTime++;
@@ -180,6 +272,7 @@ void Simulator::CalcStatistics() {
     _avgResponseTime /= countProcess;
     _avgTurnaroundTime /= countProcess;
     _avgServiceTime /= countProcess;
+    _pageStatistics.hitRate = (static_cast<double>(_pageStatistics.hits) / (_pageStatistics.miss + _pageStatistics.hits)) * 100;
 }
 
 /**
@@ -194,23 +287,32 @@ std::string Simulator::getResults() {
         << "%\nTempo médio de espera (Average waiting time): " << _avgWaitingTime
         << "\nTempo médio de resposta (Average response time): "
         << _avgResponseTime << "\nTempo médio de retorno (Average turnaround time): " << _avgTurnaroundTime
-        << "\nTempo médio de serviço (Average service time): " << _avgServiceTime;
+        << "\nTempo médio de serviço (Average service time): " << _avgServiceTime
+        << "\nEstatísticas da paginação (Paging Statistics):" << "\n\tHits: " << _pageStatistics.hits
+        << "\n\tMiss: " << _pageStatistics.miss
+        << "\n\tHit Rate: " << std::setprecision(3) << _pageStatistics.hitRate << "%";
     return out.str();
 }
 
 /***
- * If debugmode print debug
- * @param happen
+ * If in debugmode print debug msg
  */
 void Simulator::DebugLog(std::string happen) {
     if (Simulator::debugmode) std::cout << happen << std::endl;
 }
 
+/***
+ * If in debugmode print debug msg w/ instantTime
+ */
 void Simulator::DebugLog(double instantTime, std::string happen) {
-    if (Simulator::debugmode) std::cout << "T = " << instantTime << ": " << happen << std::endl;
+    if (Simulator::debugmode) std::cout << "\tT = " << instantTime << ": " << happen << std::endl;
 }
 
+/***
+ * Clear the system status, important if want to execute another algorithm in same set of process and pages
+ */
 void Simulator::Clear(int maxMultiprogramming, bool step_by_step, bool debugmode) {
+
 	this->_cpuIdle = true;
 	this->_quantum = 0;
 	this->debugmode = debugmode;
@@ -219,7 +321,7 @@ void Simulator::Clear(int maxMultiprogramming, bool step_by_step, bool debugmode
 
 	this->lastUpdate = 0;
 	this->countProcess = 0;
-	// statistics
+	// _pageStatistics
 	this->_elapsedTime = 0;
 	this->_processorUse = 0;
 	this->_avgWaitingTime = 0;
@@ -231,10 +333,12 @@ void Simulator::Clear(int maxMultiprogramming, bool step_by_step, bool debugmode
 
 	//queues
 	this->incomingQueue.clear();
-	this->readysuspendQueue.clear();
+	this->waitingQueue.clear();
 	this->readyQueue.clear();
+    this->readySuspensedQueue.clear();
 	this->runningProcess.clear();
 	this->blockedQueue.clear();
+    this->blockedSuspensedQueue.clear();
 
 	this->out.clear();
 }

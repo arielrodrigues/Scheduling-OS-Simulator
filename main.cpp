@@ -1,13 +1,16 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 
 #include "sOS-Sim.h"
-#include "Algorithms.h"
+#include "ProcessSchedulingAlgorithms.h"
 #include "FileManager.h"
+#include "PageReplacementAlgorithms.h"
 
-std::vector<std::tuple<int, double, int, double, double>> process;
-bool step_by_step = false, debug_mode = false;
+std::vector<std::tuple<int, double, int, double, double, std::vector<Page>>> process;
+std::vector<Page> getPages(std::string _pages);
+bool step_by_step = false, debug_mode = true;
 
 /**
  * Reads the file, takes the tuples from the processes and places them in a vector;
@@ -20,60 +23,71 @@ void filetoVectorofTuples(std::string filename) {
 
 	std::ifstream file(filename.c_str(), std::ifstream::in);
 	double submissionTime, executionTime, blockTime;
+    std::string _pages;
 	int PID, priority;
 
-	std::stringstream ss = readFile(filename);
+    std::istringstream pagesFile(readFile(filename+"_pages.txt").str());
+    std::stringstream processFile = readFile(filename+"_process.txt");
+
 	for (auto i = 0; i < FileManager::numberofLines; i++) {
-		ss >> PID >> submissionTime >> priority >> executionTime >> blockTime;
+		processFile >> PID >> submissionTime >> priority >> executionTime >> blockTime;
 		executionTime -= blockTime;
 		if (debug_mode)
 			std::cout << PID << " " << submissionTime << " " << priority << " " << executionTime << " " << blockTime << "\n";
-		process.push_back(std::tuple<int, double, int, double, double>(PID, submissionTime, priority,
-		                                                               executionTime, blockTime));
+        std::getline(pagesFile, _pages);
+		process.push_back(std::tuple<int, double, int, double, double, std::vector<Page>>(PID, submissionTime, priority,
+		                                                               executionTime, blockTime,getPages(_pages)));
 	}
 }
 
+std::vector<Page> getPages(std::string _pages) {
+    std::vector<Page> pages;
+    std::stringstream aux_pages(_pages);
+    int pid, time, value;
+    char colon;
+
+    aux_pages >> pid;
+    while (aux_pages >> time) {
+        aux_pages >> colon >> value;
+        pages.push_back(Page(time, 0, value, pid));
+    }
+
+    // sort pages by time
+    std::sort(pages.begin(), pages.end());
+    // Update life time in all pages
+    for (int i = 0; i < pages.size(); i++)
+        pages[i].setLifeTime(pages[i+1].getFirstUse() - pages[i].getFirstUse());
+    return pages;
+}
+
 int main() {
-	// Algorithms
-	//bool (*FCFS)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::FCFS;
-	bool (*RR)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::RR;
-	bool (*HRRN)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::HRRN;
-	bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::PRIORITY;
-	bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::LOTTERY;
-	bool (*SD) (std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::SD;
-	bool (*FEEDBACK)(std::vector <Process>*, std::vector<Process>*, int*, double) = Algorithms::FEEDBACK;
+	// Short Time Scheduling Algorithms
+	bool (*RR)(std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::RR;
+	bool (*HRRN)(std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::HRRN;
+	bool (*PRIORITY)(std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::PRIORITY;
+	bool (*LOTTERY)(std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::LOTTERY;
+	bool (*SD) (std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::SD;
+	bool (*FEEDBACK)(std::vector <Process>*, std::vector<Process>*, int*, double) = ProcessSchedulingAlgorithms::FEEDBACK;
 
-	// vector of algorithms
-	std::vector<bool (*)(std::vector <Process>*, std::vector<Process>*, int*, double)> algorithms;
-	algorithms.push_back(RR);
-	algorithms.push_back(HRRN);
-	algorithms.push_back(PRIORITY);
-	algorithms.push_back(LOTTERY);
-	algorithms.push_back(SD);
-	algorithms.push_back(FEEDBACK);
+    // Page Replacement Algorithms
+    bool (*FIFO)(std::vector<Page>*, std::vector<Page>*, Page, double) = PageReplacementAlgorithms::FIFO;
+    bool (*LRU)(std::vector<Page>*, std::vector<Page>*, Page, double) = PageReplacementAlgorithms::LRU;
 
-	Simulator sim(0, step_by_step, debug_mode);
-	std::stringstream out;
+    std::stringstream out;
+	Simulator sim(50, step_by_step, debug_mode);
+    ProcessSchedulingAlgorithms::maxProcessMultiprogramming = 50;
 
-	for (uint32_t alfa = 100; alfa < 300; alfa*=2) {
-		out << "**** ALFA " << alfa << " ****\n";
-		std::cout << "**** ALFA " << alfa << " ****\n";
-		Algorithms::maxProcessMultiprogramming = alfa;
-		for (auto i = 1, j = 0; i < 6; i++, j = 0) {
-			out << "Cenário " << i << ": \n";
-			std::cout << "Cenário " << i << ": \n";
-			process.clear();
-			filetoVectorofTuples("/home/ariel/ClionProjects/sOS-Sim/Files4test/cenario"+std::to_string(i)+".txt");
-			for (auto algorithm: algorithms) {
-				sim.Clear(alfa, step_by_step, debug_mode);
-				out << "Algoritmo: " << ++j << "\n";
-				std::cout << "Algoritmo: " << j << "\n";
-				sim.StartSimulation(algorithm, process);
-				out << sim.getResults() << "\n\n";
-			}
-		}
-	}
+    // get process from file
+    process.clear();
+    filetoVectorofTuples("/home/ariel/ClionProjects/sOS-Sim/Files4Test/cenario1");
 
-	FileManager::writeFile("/home/ariel/ClionProjects/sOS-Sim/simulation.out", out.str());
+    out << "Cenário 1:\n" << "\tShort Time Scheduling Algorithm: Round Robbin - Quantum = 2\n";
+    std::cout << "Cenário 1:\n" << "\tShort Time Scheduling Algorithm: Round Robbin - Quantum = 2\n";
+    out << "\rPage replacement Algorithm: FIFO \n";
+    std::cout << "\tPage replacement Algorithm: FIFO \n";
+    sim.StartSimulation(RR,FIFO, process);
+    out << sim.getResults() << "\n\n";
+
+	FileManager::writeFile("/home/ariel/ClionProjects/sOS-Sim/Files4Test/simulation.out", out.str());
 	return 0;
 }

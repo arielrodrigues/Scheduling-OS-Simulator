@@ -4,27 +4,28 @@ Process::Process() {
     this->PID = 0;
     this->submissionTime = 0;
     this->priority = 0;
-    this->executionTime = 0;
+    this->remainsExecutionTime = 0;
     this->blockTime = 0;
     this->timesExecuted = 0;
 
     this->waitingTime = 0;
     this->responseTime = 0;
 
-	executionTime__ = executionTime;
+	totalExecutationTime = remainsExecutionTime;
 }
 
-Process::Process(std::tuple<int, double, int, double, double> _process) {
+Process::Process(std::tuple<int, double, int, double, double, std::vector<Page>> _process) {
     this->PID = _getPID(_process);
     this->submissionTime = _getSubmissionTime(_process);
     this->priority = _getPriority(_process);
-    this->executionTime = _getExecutionTime(_process);
+    this->remainsExecutionTime = _getExecutionTime(_process);
     this->blockTime = _getBlockedTime(_process);
     this->waitingTime = -1;
     this->responseTime = -1;
     this->timesExecuted = 0;
+    this->pages = _getPages(_process);
 
-	executionTime__ = executionTime;
+	totalExecutationTime = remainsExecutionTime;
 }
 
 int Process::getPID() {
@@ -44,7 +45,7 @@ int Process::getTimesExecuted() {
 }
 
 double Process::getExecutionTime() {
-    return executionTime;
+    return remainsExecutionTime;
 }
 
 double Process::getBlockTime() {
@@ -63,6 +64,22 @@ double Process::getTurnaroundTime() {
 	return turnaroundTime;
 }
 
+Page Process::getPage() {
+    if (pages[0].getFirstUse() > this->totalExecutationTime - remainsExecutionTime)
+        return Page(0,0,0,0);
+    if (pages[0].getLifeTime() > 0)
+        return pages[0];
+    else {
+        pages.erase(pages.begin());
+        if (pages[0].getLifeTime() > 0)
+            return pages[0];
+    }
+}
+
+std::vector<Page> Process::getAllPages() {
+    return pages;
+}
+
 void Process::updateSubmissionTime(double _submissionTime) {
     this->submissionTime =  _submissionTime;
 }
@@ -73,7 +90,7 @@ void Process::setResponseTime(double _elapsedTime) {
 }
 
 void Process::setWaitingTime(double _elapsedTime) {
-    this->waitingTime = _elapsedTime - (this->submissionTime + this->executionTime__);
+    this->waitingTime = _elapsedTime - (this->submissionTime + this->totalExecutationTime);
 }
 
 void Process::setTurnaroundTime(double _elapsedTime) {
