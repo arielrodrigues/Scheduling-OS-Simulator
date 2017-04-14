@@ -71,11 +71,13 @@ int main() {
 
     // Page Replacement Algorithms
     bool (*FIFO)(std::vector<Page>*, std::vector<Page>*, Page, double) = PageReplacementAlgorithms::FIFO;
+    bool (*CLOCK)(std::vector<Page>*, std::vector<Page>*, Page, double) = PageReplacementAlgorithms::CLOCK;
     bool (*LRU)(std::vector<Page>*, std::vector<Page>*, Page, double) = PageReplacementAlgorithms::LRU;
+    bool (*OPTIMAL)(std::vector<Page>*, std::vector<Page>*, Page, double) = NULL;
 
     std::stringstream out;
-	Simulator sim(50, step_by_step, debug_mode);
-    ProcessSchedulingAlgorithms::maxProcessMultiprogramming = 50;
+	Simulator sim(20, step_by_step, debug_mode);
+    ProcessSchedulingAlgorithms::maxProcessMultiprogramming = 20;
 
     // get process from file
     process.clear();
@@ -85,7 +87,7 @@ int main() {
     std::cout << "Cenário 1:\n" << "\tShort Time Scheduling Algorithm: Round Robbin - Quantum = 2\n";
     out << "\rPage replacement Algorithm: FIFO \n";
     std::cout << "\tPage replacement Algorithm: FIFO \n";
-    sim.StartSimulation(RR,FIFO, process);
+    sim.StartSimulation(RR,LRU, process);
     out << sim.getResults() << "\n\n";
 
 	FileManager::writeFile("/home/ariel/ClionProjects/sOS-Sim/Files4Test/simulation.out", out.str());

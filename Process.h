@@ -3,6 +3,7 @@
 #include <tuple>
 #include <map>
 #include <vector>
+#include <limits>
 #include "Page.h"
 
 #ifndef SIMPLE_OS_SIMULATOR_PROCESS_H
@@ -43,11 +44,19 @@ public:
     void incrementTimesExecuted();
 	void decrementExecutionTime() { if (remainsExecutionTime > 0) --remainsExecutionTime; }
 	void decrementBlockTime() { if (blockTime > 0) --blockTime; }
-    void decrementPageLifeTime() { if (pages[0].getLifeTime() > 0) pages[0].decrementLifeTime(); }
+    void decrementPageLifeTime() { if (!pages.empty() && pages[0].getLifeTime() > 0) pages[0].decrementLifeTime(); }
 
 	//only for lottery algorithm (determine the range of tickets)
 	uint32_t firstTicket, lastTicket;
 	double totalExecutationTime;
+
+	// only for optimal algorithm (return in wich time in future the page will be used by this process)
+	int willUsePage(Page page) {
+		for (int i = 0; i < pages.size(); i++)
+			if (page.getValue() == pages[i].getValue()) return i; // will use the page in instant i
+		return std::numeric_limits<int>::max(); // will not use the page
+	}
+
 private:
     std::vector<Page> pages;
     int PID, priority, timesExecuted;

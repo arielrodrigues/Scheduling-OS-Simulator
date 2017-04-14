@@ -75,7 +75,7 @@ void Simulator::TerminateProcess(Process _process) {
     _avgResponseTime += _process.getResponseTime();
     _avgServiceTime += (_elapsedTime - _process.getSubmissionTime() - _process.getWaitingTime());
     _avgTurnaroundTime += _process.getTurnaroundTime();
-    DebugLog(_elapsedTime, ("Processo " + std::to_string(_process.getPID()) + " finalizado"));
+    DebugLog(_elapsedTime, ("Process " + std::to_string(_process.getPID()) + " terminated"));
 }
 
 /***
@@ -83,17 +83,18 @@ void Simulator::TerminateProcess(Process _process) {
  */
 void Simulator::CheckIncomingQueue() {
     for (auto i = incomingQueue.size(); i-- > 0;) {
-        if (remainingSubmissionTime(incomingQueue[i]) <= 0) { // move to waitingQueue
-            waitingQueue.push_back(incomingQueue[i]);
+        if (remainingSubmissionTime(incomingQueue[i]) <= 0) {
+            // put process' pages on disk
             for (Page page : incomingQueue[i].getAllPages()) Disk.push_back(page);
+            // move process to waiting list
+            waitingQueue.push_back(incomingQueue[i]);
             incomingQueue.erase(incomingQueue.begin() + i);
-            DebugLog(_elapsedTime, "Processo " + std::to_string(incomingQueue[i].getPID()) + " submetido");
         }
     }
 }
 
 /***
- * Check if the page that process need to execute righ now is in memory
+ * Check if the page that process need to execute right now is in memory
  * @return page is in memory?
  */
 
@@ -102,7 +103,8 @@ bool Simulator::PageInMemory() {
     for (int i = 0; i < memoryFrames.size(); i++)
         if (memoryFrames[i].getValue() == runningProcess[0].getPage().getValue()
             && memoryFrames[i].getPID() == runningProcess[0].getPage().getPID()) {
-            memoryFrames[i].setUsed(_elapsedTime);
+            memoryFrames[i].setLastTimeUsed(_elapsedTime + 1); // will be used in next cpu cycle
+            memoryFrames[i].setreference(); // page referenced
             _pageStatistics.hits++;
             return true;
         }
@@ -129,27 +131,28 @@ void Simulator::CheckRunningProcess() {
         runningProcess[0].decrementPageLifeTime();
         if (runningProcess[0].getExecutionTime() < 1) {
             if (runningProcess[0].getBlockTime() > 0) { // block process
-                if (!waitingQueue.empty()) { // if are process waiting, block and suspense process
+                if (!waitingQueue.empty() && isSysFull()) { // if are process waiting, block and suspense process
                     blockedSuspensedQueue.push_back(runningProcess[0]);
-                    RemovePages(runningProcess[0].getPID());
                     DebugLog(_elapsedTime,
-                             ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado e suspenso"));
+                             ("Process " + std::to_string(runningProcess[0].getPID()) + " bloqueado e suspenso"));
                 } else { // just block processs
                     blockedQueue.push_back(runningProcess[0]);
                     DebugLog(_elapsedTime,
-                             ("Processo " + std::to_string(runningProcess[0].getPID()) + " bloqueado e pronto"));
+                             ("Process " + std::to_string(runningProcess[0].getPID()) + " bloqueado"));
                 }
+                RemovePages(runningProcess[0].getPID());
                 runningProcess.erase(runningProcess.begin());
             } else { // terminate process
                 runningProcess[0].setTurnaroundTime(_elapsedTime);
                 runningProcess[0].setWaitingTime(_elapsedTime);
+                RemovePages(runningProcess[0].getPID());
                 TerminateProcess(runningProcess[0]);
                 runningProcess.erase(runningProcess.begin());
             }
         } else if (this->_quantum < 1) { // send process back to ready queue
             readyQueue.push_back(runningProcess[0]);
             DebugLog(_elapsedTime,
-                     ("Processo " + std::to_string(runningProcess[0].getPID()) + " pronto"));
+                     ("Process " + std::to_string(runningProcess[0].getPID()) + " ready"));
             runningProcess.erase(runningProcess.begin());
         }
     }
@@ -183,19 +186,8 @@ void Simulator::CheckBlockedQueue() {
  * Check each suspensed process and, if has space on memory, put it in non active (non suspensed) mode
  */
 void Simulator::CheckReadySuspensedQueue() {
-    if (waitingQueue.empty() && !readySuspensedQueue.empty() && !isSysFull()) // if has no process waiting to born
+    while (waitingQueue.empty() && !readySuspensedQueue.empty() && !isSysFull()) // if has no process waiting to born
         ProcessSchedulingAlgorithms::FCFS(&readySuspensedQueue, &readyQueue, _elapsedTime);
-}
-
-
-/***
- * Call function to check all queues
- */
-void Simulator::CheckQueues() {
-    CheckIncomingQueue();
-    CheckBlockedQueue();
-    CheckReadySuspensedQueue();
-    CheckRunningProcess();
 }
 
 
@@ -231,24 +223,32 @@ void Simulator::StartSimulation(
 
     for (;!EmptyQueue(); lastUpdate = time(NULL))
         if (time(NULL) - lastUpdate >= SPEED_) {
-            // Check queues
-            CheckQueues();
+
+            // Check Incoming queue
+            CheckIncomingQueue();
 
             // Medium-term scheduling
             while (!isSysFull()) {
                 if (!waitingQueue.empty()) {
-                    if (ProcessSchedulingAlgorithms::FCFS(&waitingQueue, &readyQueue, _elapsedTime))
-                        pageReplacementAlgorithm(&memoryFrames, &Disk, readyQueue.back().getPage(), _elapsedTime);
+                    if (ProcessSchedulingAlgorithms::FCFS(&waitingQueue, &readyQueue, _elapsedTime)) // if a process is ready its first page may stay in memory
+                        if (pageReplacementAlgorithm) pageReplacementAlgorithm(&memoryFrames, &Disk, readyQueue.back().getAllPages()[0], _elapsedTime);
+                        else PageReplacementAlgorithm_OPTIMAL();// call optimal algorithm
                 } else break;
             }
+
+            // Check queues
+            CheckBlockedQueue();
+            CheckReadySuspensedQueue();
+            CheckRunningProcess();
 
             // Short-term scheduling
             if (noProcessRunning())
                 _cpuIdle = !shortTermSchedulingAlgorithm(&readyQueue, &runningProcess, &_quantum, _elapsedTime);
 
             // Check if page of running process is in memory
-            if (!_cpuIdle && !PageInMemory())
-                pageReplacementAlgorithm(&memoryFrames, &Disk, runningProcess[0].getPage(), _elapsedTime);
+            if (!_cpuIdle && runningProcess[0].getExecutionTime() > 0 && !PageInMemory())
+                if (pageReplacementAlgorithm) pageReplacementAlgorithm(&memoryFrames, &Disk, runningProcess[0].getPage(), _elapsedTime);
+                else PageReplacementAlgorithm_OPTIMAL(); // call optimal algorithm
 
             // Update counters
             _elapsedTime++;
@@ -341,4 +341,60 @@ void Simulator::Clear(int maxMultiprogramming, bool step_by_step, bool debugmode
     this->blockedSuspensedQueue.clear();
 
 	this->out.clear();
+}
+
+
+bool Simulator::PageReplacementAlgorithm_OPTIMAL() {
+    try {
+        Page page = runningProcess[0].getPage();
+        if (!Disk.empty() && page.getLifeTime() > 0) {
+            int i = 0, opt_p = 0, futureUse = -1;
+            // search page on disk
+            for (; i < Disk.size() && !(Disk[i].getValue() == page.getValue() && Disk[i].getPID() == page.getPID()); i++);
+            if (i > Disk.size()) { Simulator::DebugLog("ERRO. PÁGINA NÃO ENCONTRADA NO DISCO"); exit(1);}
+
+            if (memoryFrames.empty()) {
+                memoryFrames.push_back(Disk[i]);
+                Disk.erase(Disk.begin()+i);
+                DebugLog(_elapsedTime, "Page "+std::to_string(page.getValue())+" of pid "+
+                                       std::to_string(page.getPID())+" moved from disk to memory");
+            }
+            else {
+                // search optimal solution
+                for (int j = 0; j < memoryFrames.size(); j++) {
+                    if (memoryFrames[j].getPID() == runningProcess[0].getPID()) {// look in runningProcess
+                        if (runningProcess[0].willUsePage(memoryFrames[j]) > futureUse) {
+                            opt_p = j;
+                            futureUse = runningProcess[0].willUsePage(memoryFrames[j]);
+                        }
+                    } else { // if the page is used by first process or not pertence to it, check all others process in memory
+                        for (int k = 0; k < readyQueue.size(); k++) {
+                            if (memoryFrames[j].getPID() == readyQueue[k].getPID()) {
+                                if (readyQueue[k].willUsePage(memoryFrames[j]) > futureUse) {
+                                    opt_p = j;
+                                    futureUse = readyQueue[k].willUsePage(memoryFrames[j]);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (futureUse == std::numeric_limits<int>::max()) break;
+                }
+
+                // replace page in optimal solution finded
+                Disk.push_back(memoryFrames[opt_p]);
+                DebugLog(_elapsedTime, "Page " + std::to_string(memoryFrames[opt_p].getValue()) + " of pid " +
+                                                       std::to_string(memoryFrames[opt_p].getPID()) + " moved to disk");
+
+                // move page from disk to memory
+                memoryFrames[opt_p] = Disk[i];
+                DebugLog(_elapsedTime, "Page "+std::to_string(page.getValue())+" of pid "+
+                                                            std::to_string(page.getPID())+" moved from disk to memory");
+            }
+            return true;
+        } return false;
+    } catch(...) {
+        std::cout << "Erro ao substituir página." << std::endl;
+        return false;
+    }
 }

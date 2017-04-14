@@ -65,6 +65,7 @@ double Process::getTurnaroundTime() {
 }
 
 Page Process::getPage() {
+    if (pages.empty()) return Page(0,0,0,0);
     if (pages[0].getFirstUse() > this->totalExecutationTime - remainsExecutionTime)
         return Page(0,0,0,0);
     if (pages[0].getLifeTime() > 0)

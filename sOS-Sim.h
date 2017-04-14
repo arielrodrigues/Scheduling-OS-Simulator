@@ -29,7 +29,7 @@ public:
 	static void DebugLog(double instantTime, std::string happen);
 	void Clear(int maxMultiprogramming, bool step_by_step, bool debugmode);
 
-	static const int numberOfMemoryFrames = 3;
+	static const int numberOfMemoryFrames = 30;
 
 private:
     bool isSysFull();
@@ -40,10 +40,11 @@ private:
 	void CheckBlockedQueue();
 	void CheckIncomingQueue();
     void CheckReadySuspensedQueue();
-	void CheckQueues();
 	void CalcStatistics();
 	bool PageInMemory();
     void RemovePages(uint32_t PID);
+
+    bool PageReplacementAlgorithm_OPTIMAL();
 
 	static bool debugmode;
 	static int _quantum;

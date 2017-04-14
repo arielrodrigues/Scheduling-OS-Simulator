@@ -23,7 +23,7 @@ namespace ProcessSchedulingAlgorithms {
         try {
             if (!waitingQueue->empty()) {
                 Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*waitingQueue)[0].getPID()) + " pronto");
+                                    "Process " + std::to_string((*waitingQueue)[0].getPID()) + " pronto");
 
                 (*waitingQueue)[0].updateSubmissionTime(_elapsedTime);
                 readyQueue->push_back((*waitingQueue)[0]);
@@ -62,7 +62,7 @@ namespace ProcessSchedulingAlgorithms {
 
 
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[hrr].getPID()) + " em execução");
+	                                "Process " + std::to_string((*readyQueue)[hrr].getPID()) + " running");
 
 	            // set as running process
                 runningList->push_back((*readyQueue)[hrr]);
@@ -97,7 +97,7 @@ namespace ProcessSchedulingAlgorithms {
 	            // set response time
 	            if (firstTimeRunning((*readyQueue)[maxpriority])) (*readyQueue)[maxpriority].setResponseTime(_elapsedTime);
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[maxpriority].getPID()) + " em execução");
+	                                "Process " + std::to_string((*readyQueue)[maxpriority].getPID()) + " running");
 
 	            // set as running process
                 runningList->push_back((*readyQueue)[maxpriority]);
@@ -145,7 +145,7 @@ namespace ProcessSchedulingAlgorithms {
 	            if (firstTimeRunning((*readyQueue)[winner])) (*readyQueue)[winner].setResponseTime(_elapsedTime);
 
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[winner].getPID()) + " em execução");
+	                                "Process " + std::to_string((*readyQueue)[winner].getPID()) + " running");
 
 	            // set as running process
 	            runningList->push_back((*readyQueue)[winner]);
@@ -160,24 +160,27 @@ namespace ProcessSchedulingAlgorithms {
     }
 
 	/***
-	 * Round Robin (RR) scheduling algorithm w/ quantum = 4
+	 * Round Robin (RR) scheduling algorithm w/ quantum = 2
 	 * Used to short-term Scheduling
 	 * @return (*readyQueue)[0]
 	 */
     static bool RR(std::vector<Process>* readyQueue, std::vector<Process>* runningList, int* _quantum, double _elapsedTime) {
         try {
             if (!readyQueue->empty()) {
-
-	            // set Quantum as 4
+	            // set Quantum as 2
 	            (*_quantum) = 2;
 				// set response time
 	            if (firstTimeRunning((*readyQueue)[0])) (*readyQueue)[0].setResponseTime(_elapsedTime);
 
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
+	                                "Process " + std::to_string((*readyQueue)[0].getPID()) + " running");
 
-	            // set process as running
-	            runningList->push_back((*readyQueue)[0]);
+                // set process as running
+                if (!(*runningList).empty()) {
+                    (*readyQueue).push_back((*runningList)[0]);
+                    (*runningList)[0] = (*readyQueue)[0];
+                } else (*runningList).push_back((*readyQueue)[0]);
+
                 readyQueue->erase(readyQueue->begin());
                 return true;
             } else return false;
@@ -202,7 +205,7 @@ namespace ProcessSchedulingAlgorithms {
 	            if (firstTimeRunning((*readyQueue)[0])) (*readyQueue)[0].setResponseTime(_elapsedTime);
 
 	            Simulator::DebugLog(_elapsedTime,
-	                                "Processo " + std::to_string((*readyQueue)[0].getPID()) + " em execução");
+	                                "Process " + std::to_string((*readyQueue)[0].getPID()) + " running");
 
 	            // set process as running
 	            runningList->push_back((*readyQueue)[0]);
@@ -249,7 +252,7 @@ namespace ProcessSchedulingAlgorithms {
 	            // set response time
                 if (firstTimeRunning((*readyQueue)[minpriority])) (*readyQueue)[minpriority].setResponseTime(_elapsedTime);
                 Simulator::DebugLog(_elapsedTime,
-                                    "Processo " + std::to_string((*readyQueue)[minpriority].getPID()) + " em execução");
+                                    "Process " + std::to_string((*readyQueue)[minpriority].getPID()) + " running");
 
                 // set as running process
                 runningList->push_back((*readyQueue)[minpriority]);
